@@ -1,0 +1,11 @@
+commit afe5a567c39cec06a75e560b57b73db5fc35525d (HEAD -> master)
+Author: Simon Karasik <senich10@mail.ru>
+Date:   Fri Feb 9 15:57:42 2018 +0300
+
+    status.txt added
+
+commit 22c05f3548111b3addd18368b43b31aa1792c202
+Author: Simon Karasik <senich10@mail.ru>
+Date:   Fri Feb 9 15:55:34 2018 +0300
+
+    add .gitignore
