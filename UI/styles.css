@@ -1,0 +1,189 @@
+html {
+    height: 100%;
+}
+
+.font--menu {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.menu-panel {
+    font-size: 1em;
+    font-weight: bold;
+    border: 2px solid silver;
+    border-radius: 0.2em;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.root {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    position: relative;
+    height: 100vv;
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    align-content: space-between;
+    border-bottom: 2px solid silver;
+    padding: 0.5em;
+    font-family: "Julius Sans One", sans-serif;
+}
+
+.header__avatar {
+    width: 25px;
+    height: 25px;
+}
+
+.header__title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.8em;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    flex: 1 0 auto;
+}
+
+.sidebar {
+ 
+}
+
+
+.menu {
+    top: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.menu__item {
+    border-top: 1px solid silver;
+    padding: 0.2em;
+}
+
+.search__option {
+    display: flex;
+    margin: 0.2em;
+    margin-left: 0;
+}
+
+.search {
+    padding: 0.2em;
+}
+
+.search__field {
+    margin: 0;
+    padding: 0;
+}
+
+.search__title {
+    margin-bottom: 0.1em;
+    display: inline-block;
+}
+
+.search__field {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+}
+
+.search__check {
+    border: 1px solid black;
+    border-left: 0;
+    margin: 0;
+    padding: 0;
+    /* appearance: none; */
+    /* background-color: red; */
+    /* -moz-appearance: none; */
+    /* -webkit-appearance: none; */
+    /* font-size: 1.5em; */
+    /* width: 1em; */
+    /* height: 1em; */
+}
+
+.menu__item:first-child {
+    border-top: none;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    margin: auto;    
+}
+
+.post {
+    margin: 1em 0;
+    width: 100%;
+    position: relative;
+    border: 1px solid black;
+}
+
+.post__actions-panel {
+    vertical-align: middle;
+}
+
+.post__header {
+    margin: 0;
+    padding: 0.5em;
+}
+
+.right {
+    float: right;
+}
+
+.post__photo {
+    width: 100%;
+}
+
+.post__like-panel {
+    float: left;
+    padding-right: 1em;
+
+}
+
+.post__information {
+
+}
+
+.post__description {
+    margin: 0;
+}
+
+.post__footer {
+    padding: 0.5em;
+}
+
+.footer {
+    padding: 0.2em;
+    border-top: 1px solid black;
+    flex-shrink: 0;
+}
+
+.footer__description {
+    float: left;
+} 
+
+.footer__update {
+    float: right;
+}

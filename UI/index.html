@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Impression</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Julius+Sans+One" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header__user">
+            <!-- <img class="header__user__avatar" src = "avatar.JPG" width="50px"> -->
+            <span class="header_user__name">simon_karasik</span>
+        </div>
+        <h1 class="header__title">IMPRESSION</h1>
+        <a class="header__logout">
+            <i class="material-icons">exit_to_app</i>
+        </a>
+    </header>
+    <div class="content">
+        <aside class="sidebar">
+            <ul class="menu menu-panel" >
+                <li class="menu__item">
+                    <a>Impressions</a>
+                </li>
+                <li class="menu__item">
+                    <a>My impressions</a>
+                </li>
+                <li class="menu__item">
+                    <a>New impression</a>
+                </li>
+                <li class="menu__item">
+                    <a>My account</a>
+                </li>
+            </ul>
+            <div class="search menu-panel" >
+                <span class = "search__title">Search</span>
+                <div class="search__option">
+                    <input type="text" class="search__field" placeholder="By author">
+                    <input type="checkbox" class="search__check">
+                </div>
+                <div class="search__option">
+                    <input type="text" class="search__field" placeholder="By date">
+                    <input type="checkbox" class="search__check">
+                </div>
+                <div class="search__option">
+                    <input type="text" class="search__field" placeholder="By tag">
+                    <input type="checkbox" class="search__check">
+                </div>
+                <button class = "search__button">Search</button>
+            </div>
+        </aside>
+        <main class="main">
+            <div class="post">
+                <header class="post__header">
+                    <span class="post__author">simon_karasik</span>
+                    <span class="right">
+                        <span class="post__date">19.02.18</span>
+                        <span class="post__actions-panel">
+                            <i class="material-icons" style>create</i>
+                            <i class="material-icons" style >close</i>
+                        </span>
+                    </span>
+                </header>
+                <img class="post__photo" src="photo1.JPEG">
+                <footer class="post__footer">
+                    <div class="post__like-panel">
+                        <div><a class="post__like">
+                            <i class="material-icons">favorite</i>
+                        </a></div>
+                        <span class="post__likes-count">42</span>
+                    </div>
+                    <div class="post__information">
+                        <div class="post__tags">
+                            <a class="post__tag">
+                                #beatiful
+                            </a>
+                            <a class="post__tag">
+                                #sunset
+                            </a>
+                            <a class="post__tag">
+                                #worthten
+                            </a>
+                        </div>
+                        <p class = "post__description">
+                            That was a wonderful sunset in the middle of summer.
+                        </p>
+                    </div>
+                </footer>
+            </div>
+            <div class="post">
+                    <header class="post__header">
+                        <span class="post__author">simon_karasik</span>
+                        <span class="right">
+                            <span class="post__date">19.02.18</span>
+                            <span class="post__actions-panel">
+                                <i class="material-icons" style>create</i>
+                                <i class="material-icons" style >close</i>
+                            </span>
+                        </span>
+                    </header>
+                    <img class="post__photo" src="photo1.JPEG">
+                    <footer class="post__footer">
+                        <div class="post__like-panel">
+                            <div><a class="post__like">
+                                <i class="material-icons">favorite</i>
+                            </a></div>
+                            <span class="post__likes-count">42</span>
+                        </div>
+                        <div class="post__information">
+                            <div class="post__tags">
+                                <a class="post__tag">
+                                    #beatiful
+                                </a>
+                                <a class="post__tag">
+                                    #sunset
+                                </a>
+                                <a class="post__tag">
+                                    #worthten
+                                </a>
+                            </div>
+                            <p class = "post__description">
+                                That was a wonderful sunset in the middle of summer.
+                            </p>
+                        </div>
+                    </footer>
+                </div>
+            <button class="load-more">Load more...</button>
+        </main>
+    </div>
+    <footer class="footer">
+        <span class="footer__description">
+            Impression by Simon Karasik,
+            <a class="footer__email" href="mailto:senich10@mail.ru">
+                senich10@mail.ru
+            </a>
+            ,&nbsp FAMCS, group 5
+        </span>
+        <span class="footer__update">
+            Last update:
+            <span id="update-date">19.02.18</span>
+        </span>
+    </footer>
+</body>
+
+</html>
