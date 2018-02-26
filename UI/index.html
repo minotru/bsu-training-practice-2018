@@ -12,65 +12,68 @@
 <body>
     <header class="header panel">
         <div class="header__user-wrapper header__sideblock">
-            <div class = "header__user">
-                <img class="header__user__avatar" src = "avatar.JPG">
-                &nbsp
-                <span class="header_user__name">simon_karasik</span>
+            <div class="header__user">
+                <img class="header__user__avatar" src="avatar.JPG"> &nbsp
+                <span class="header__user__name">simon_karasik</span>
             </div>
         </div>
         <h1 class="header__title">IMPRESSION</h1>
-        <div class = "header__sideblock header__logout-wrapper">
-            <a class = "header__logout">
+        <div class="header__sideblock header__logout-wrapper">
+            <a class="header__logout">
                 <i class="material-icons">exit_to_app</i>
             </a>
         </div>
     </header>
     <div class="content">
         <aside class="sidebar">
-            <ul class="menu menu-panel" >
+            <ul class="menu menu-panel">
                 <li class="menu__item">
-                    <a href = "/posts" class = "bright">Impressions</a>
-                </li>
-                <li class="menu__item bright" >
-                    <a href= "/posts/user" class = "bright">My impressions</a>
+                    <a href="/posts" class="bright">Impressions</a>
                 </li>
                 <li class="menu__item bright">
-                    <a href = "/posts/create" class = "bright">New impression</a>
+                    <a href="/posts/user" class="bright">My impressions</a>
+                </li>
+                <li class="menu__item bright">
+                    <a href="/posts/create" class="bright">New impression</a>
                 </li>
                 <li class="menu__item">
-                    <a href = "/user" class = "bright">My account</a>
+                    <a href="/user" class="bright">My account</a>
                 </li>
             </ul>
-            <div class="search menu-panel" >
-                <span class = "search__title bright">Filter</span>
-                <div class="search__option">
-                    <input type="text" class="search__input" placeholder="By author">
+            <div class="search menu-panel">
+                <span class="search__title bright">Filter</span>
+                <div class="search__panel">
+                    <div class="search__option">
+                        <input type="text" class="search__input" placeholder="By author">
+                    </div>
+                    <div class="search__option">
+                        <input type="text" class="search__input" placeholder="By date">
+                    </div>
+                    <div class="search__option">
+                        <input type="text" class="search__input" placeholder="By tag">
+                    </div>
+                    <button class="search__button button">Filter</button>
                 </div>
-                <div class="search__option">
-                    <input type="text" class="search__input" placeholder="By date">
-                </div>
-                <div class="search__option">
-                    <input type="text" class="search__input" placeholder="By tag">
-                </div>
-                <button class = "search__button button">Filter</button>
             </div>
         </aside>
         <main class="main">
             <div class="post">
                 <header class="post__header">
                     <span class="post__author">simon_karasik</span>
-                    <span class = "post__header__right">
+                    <span class="post__header__right">
                         <span class="post__date">19.02.18</span>&nbsp
-                            <i class="material-icons kek">create</i>
-                            <i class="material-icons">close</i>
+                        <i class="material-icons kek">create</i>
+                        <i class="material-icons">close</i>
                     </span>
                 </header>
                 <img class="post__photo" src="photo1.JPEG">
                 <footer class="post__footer">
                     <div class="post__like-panel">
-                        <div><a class="post__like">
-                            <i class="material-icons">favorite</i>
-                        </a></div>
+                        <div>
+                            <a class="post__like">
+                                <i class="material-icons">favorite</i>
+                            </a>
+                        </div>
                         <span class="post__likes-count">42</span>
                     </div>
                     <div class="post__information">
@@ -85,49 +88,51 @@
                                 #worthten
                             </a>
                         </div>
-                        <p class = "post__description">
+                        <p class="post__description">
                             That was a wonderful sunset in the middle of summer.
                         </p>
                     </div>
                 </footer>
             </div>
             <div class="post">
-                    <header class="post__header">
-                        <span class="post__author">simon_karasik</span>
-                        <span class="right">
-                            <span class="post__date">19.02.18</span>
-                            <span class="post__actions-panel">
-                                <i class="material-icons" style>create</i>
-                                <i class="material-icons" style >close</i>
-                            </span>
+                <header class="post__header">
+                    <span class="post__author">simon_karasik</span>
+                    <span class="right">
+                        <span class="post__date">19.02.18</span>
+                        <span class="post__actions-panel">
+                            <i class="material-icons" style>create</i>
+                            <i class="material-icons" style>close</i>
                         </span>
-                    </header>
-                    <img class="post__photo" src="photo1.JPEG">
-                    <footer class="post__footer">
-                        <div class="post__like-panel">
-                            <div><a class="post__like">
+                    </span>
+                </header>
+                <img class="post__photo" src="photo1.JPEG">
+                <footer class="post__footer">
+                    <div class="post__like-panel">
+                        <div>
+                            <a class="post__like">
                                 <i class="material-icons">favorite</i>
-                            </a></div>
-                            <span class="post__likes-count">42</span>
+                            </a>
                         </div>
-                        <div class="post__information">
-                            <div class="post__tags">
-                                <a class="post__tag">
-                                    #beatiful
-                                </a>
-                                <a class="post__tag">
-                                    #sunset
-                                </a>
-                                <a class="post__tag">
-                                    #worthten
-                                </a>
-                            </div>
-                            <p class = "post__description">
-                                That was a wonderful sunset in the middle of summer.
-                            </p>
+                        <span class="post__likes-count">42</span>
+                    </div>
+                    <div class="post__information">
+                        <div class="post__tags">
+                            <a class="post__tag">
+                                #beatiful
+                            </a>
+                            <a class="post__tag">
+                                #sunset
+                            </a>
+                            <a class="post__tag">
+                                #worthten
+                            </a>
                         </div>
-                    </footer>
-                </div>
+                        <p class="post__description">
+                            That was a wonderful sunset in the middle of summer.
+                        </p>
+                    </div>
+                </footer>
+            </div>
             <button class="load-more-button button">Load more...</button>
         </main>
     </div>
