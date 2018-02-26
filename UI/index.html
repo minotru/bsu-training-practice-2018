@@ -10,10 +10,11 @@
 </head>
 
 <body>
-    <header class="header">
+    <header class="header panel">
         <div class="header__user-wrapper header__sideblock">
             <div class = "header__user">
-                <!-- <img class="header__user__avatar" src = "avatar.JPG" width="50px"> -->
+                <img class="header__user__avatar" src = "avatar.JPG">
+                &nbsp
                 <span class="header_user__name">simon_karasik</span>
             </div>
         </div>
@@ -24,38 +25,34 @@
             </a>
         </div>
     </header>
-    <!-- <div style = "overflow-y:scroll;">  -->
     <div class="content">
         <aside class="sidebar">
             <ul class="menu menu-panel" >
                 <li class="menu__item">
-                    <a>Impressions</a>
+                    <a href = "/posts" class = "bright">Impressions</a>
+                </li>
+                <li class="menu__item bright" >
+                    <a href= "/posts/user" class = "bright">My impressions</a>
+                </li>
+                <li class="menu__item bright">
+                    <a href = "/posts/create" class = "bright">New impression</a>
                 </li>
                 <li class="menu__item">
-                    <a>My impressions</a>
-                </li>
-                <li class="menu__item">
-                    <a>New impression</a>
-                </li>
-                <li class="menu__item">
-                    <a>My account</a>
+                    <a href = "/user" class = "bright">My account</a>
                 </li>
             </ul>
             <div class="search menu-panel" >
-                <span class = "search__title">Search</span>
+                <span class = "search__title bright">Filter</span>
                 <div class="search__option">
-                    <input type="text" class="search__field" placeholder="By author">
-                    <input type="checkbox" class="search__check">
+                    <input type="text" class="search__input" placeholder="By author">
                 </div>
                 <div class="search__option">
-                    <input type="text" class="search__field" placeholder="By date">
-                    <input type="checkbox" class="search__check">
+                    <input type="text" class="search__input" placeholder="By date">
                 </div>
                 <div class="search__option">
-                    <input type="text" class="search__field" placeholder="By tag">
-                    <input type="checkbox" class="search__check">
+                    <input type="text" class="search__input" placeholder="By tag">
                 </div>
-                <button class = "search__button">Search</button>
+                <button class = "search__button button">Filter</button>
             </div>
         </aside>
         <main class="main">
@@ -64,10 +61,8 @@
                     <span class="post__author">simon_karasik</span>
                     <span class = "post__header__right">
                         <span class="post__date">19.02.18</span>&nbsp
-                        <!-- <span class="post__actions-panel" > -->
                             <i class="material-icons kek">create</i>
                             <i class="material-icons">close</i>
-                        <!-- </span> -->
                     </span>
                 </header>
                 <img class="post__photo" src="photo1.JPEG">
@@ -133,23 +128,22 @@
                         </div>
                     </footer>
                 </div>
-            <button class="load-more-button">Load more...</button>
+            <button class="load-more-button button">Load more...</button>
         </main>
     </div>
-    <footer class="footer">
-        <span class="footer__description">
+    <footer class="footer panel">
+        <span class="footer__description bright">
             Impression by Simon Karasik,
             <a class="footer__email" href="mailto:senich10@mail.ru">
                 senich10@mail.ru
             </a>
             ,&nbsp FAMCS, group 5
         </span>
-        <span class="footer__update">
+        <span class="footer__updat bright">
             Last update:
             <span id="update-date">19.02.18</span>
         </span>
     </footer>
-    <!-- </div> -->
 </body>
 
 </html>
