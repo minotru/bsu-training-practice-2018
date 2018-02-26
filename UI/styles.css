@@ -127,11 +127,9 @@ body {
     margin: 0;
     border: 0;
     width: auto;
-    /* border-bottom: 2px solid silver; */
 }
 
 .menu__item {
-    /* border-top: 1px solid silver; */
     padding: 0.2em;
     transition: background-color 0.2 ease-in-out;
     border: 0;
@@ -258,7 +256,19 @@ body {
 .post__like-panel {
     float: left;
     margin-right: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
+.post__tag {
+    font-weight: bold;
+}
+
+.post__like:hover {
+    color: red;
+}
+
 
 .post__information {
 
@@ -289,11 +299,11 @@ body {
 
 @media (max-width:372px) {
     .search__panel {
-        top: calc(3em + 2px);
+        top: calc(3em - 2px);
     }
 }
 
-@media (min-width:760px) {
+@media (min-width:820px) {
     .sidebar {
         width: auto;
         flex-direction: column;
@@ -301,7 +311,7 @@ body {
         font-size: 1em;
         border-bottom: 0;
         left: auto;
-        right: auto;
+        right: auto; 
     }
 
     .main {
@@ -333,7 +343,7 @@ body {
     }
 
     .menu {
-        margin: 2em 0;
+        margin: 1em 0;
         flex-direction: column;
         border: 2px solid silver;
     }
