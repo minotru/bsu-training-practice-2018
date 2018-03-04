@@ -10,16 +10,41 @@
          * @param {String} author 
          * @param {String} photoLink 
          * @param {[String]} tags 
+         * @param {[String]} likes
          */
-        constructor({description, createdAt, author, photoLink, tags = []}) {
+        constructor({description, createdAt, author, photoLink, tags = [], likes = []}) {
             this.id = PhotoPost.nextId();
             this.description = description;
             this.createdAt = createdAt;
             this.author = author;
             this.photoLink = photoLink;
             this.tags = tags;
-        
+            this.likes = likes;
         }
+
+        getLikesCnt() {
+            return this.likes.length;
+        }
+
+        /**
+         * Like this post. Calling twice with same userName wont give changes. 
+         * @param {String} userName User who liked this post.
+         */
+        like(userName) {
+            if(this.likes.indexOf(userName) === -1)
+                this.likes.push(userName);
+        } 
+
+         /**
+         * Dislike this post. Calling twice with same userName wont give changes. 
+         * @param {String} userName User who liked this post.
+         */
+        dislike(userName) {
+            const ind = this.likes.indexOf(userName);
+            if (ind !== -1)
+                this.likes.splice(ind, 1);
+        }
+
         static nextId() {
             let id = 0;
             this.nextId = () => (id++).toString();
@@ -37,7 +62,9 @@
                 (post.createdAt instanceof Date) && 
                 isString(post.author) && post.author.length > 0 &&
                 isString(post.photoLink) && post.photoLink.length > 0 &&
-                post.tags instanceof Array);
+                post.tags instanceof Array && 
+                post.likes instanceof Array
+            );
         }
     }
 
@@ -74,7 +101,7 @@
                         isGood = false;
                 }
                 if (isGood)
-                    result.push(Object.assign(new PhotoPost({}), post));
+                    result.push(post);
             }
             return result;
         }
@@ -187,6 +214,14 @@
     console.log("Add valid post(true)", photoPosts.addPhotoPost(postsData[0]));
     console.log("Add invalid post(false)", photoPosts.addPhotoPost(badPostsData[0]));
     console.log();
+    console.log("#like");
+    console.log("like post:");
+    const examplePost = new PhotoPost({author: "Arnold", description: "In USA", photoLink: "http", createdAt: new Date()});
+    examplePost.like("Simon Karasik");
+    console.log(examplePost);
+    console.log("#dislike");
+    examplePost.dislike("Simon Karasik");
+    console.log(examplePost);
 
     console.log("#getPhotoPosts(skip, top, filterOptions)");
     photoPosts = new PhotoPosts();
@@ -226,5 +261,4 @@
     console.log("post removed(true): ", photoPosts.removePhotoPost("1"));
     console.log("after removing:");
     console.log(photoPosts.getPhotoPosts(0, 10));
-    
 })();
