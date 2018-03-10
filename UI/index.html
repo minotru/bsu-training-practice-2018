@@ -8,7 +8,6 @@
     <meta name="viewport" content="initial-scale=1, width=device-width, maximum-scale=1, user-scalable=no">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Julius+Sans+One" rel="stylesheet">
-    <script src="../src/index.js"></script>
 </head>
 
 <body>
@@ -58,77 +57,9 @@
                 </div>
             </div>
         </aside>
-        <main class="main">
-            <div class="post">
-                <header class="post__header">
-                    <span class="post__author">simon_karasik</span>
-                    <span class="post__header__right">
-                        <span class="post__date">19.02.18</span>&nbsp
-                        <i class="material-icons kek">create</i>
-                        <i class="material-icons">close</i>
-                    </span>
-                </header>
-                <img class="post__photo" src="photo1.JPEG">
-                <footer class="post__footer">
-                    <div class="post__like-panel">
-                            <a class="post__like">
-                                <i class="material-icons">favorite</i>
-                            </a>
-                        <span class="post__likes-count">42</span>
-                    </div>
-                    <div class="post__information">
-                        <div class="post__tags">
-                            <a class="post__tag">
-                                #beatiful
-                            </a>
-                            <a class="post__tag">
-                                #sunset
-                            </a>
-                            <a class="post__tag">
-                                #worthten
-                            </a>
-                        </div>
-                        <p class="post__description">
-                            That was a wonderful sunset in the middle of summer.
-                        </p>
-                    </div>
-                </footer>
-            </div>
-            <div class="post">
-                <header class="post__header">
-                    <span class="post__author">simon_karasik</span>
-                    <span class="post__header__right">
-                        <span class="post__date">19.02.18</span>&nbsp
-                        <i class="material-icons kek">create</i>
-                        <i class="material-icons">close</i>
-                    </span>
-                </header>
-                <img class="post__photo" src="photo1.JPEG">
-                <footer class="post__footer">
-                    <div class="post__like-panel">
-                        <div>
-                            <a class="post__like">
-                                <i class="material-icons">favorite</i>
-                            </a>
-                        </div>
-                        <span class="post__likes-count">42</span>
-                    </div>
-                    <div class="post__information">
-                        <div class="post__tags">
-                            <a class="post__tag">
-                                #beatiful
-                            </a>
-                            <a class="post__tag">
-                                #sunset
-                            </a>
-                            <a class="post__tag">
-                                #worthten
-                            </a>
-                        </div>
-                        <p class="post__description">
-                            That was a wonderful sunset in the middle of summer.
-                        </p>
-                </footer>
+        <main class="main" id = "main">
+            <div id = "posts">
+
             </div>
             <button class="load-more-button button">Load more...</button>
         </main>
@@ -146,6 +77,7 @@
             <span id="update-date">19.02.18</span>
         </span>
     </footer>
+    <script src="bundle.js"></script>
 </body>
 
 </html>
