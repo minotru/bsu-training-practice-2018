@@ -282,8 +282,21 @@ body {
     font-weight: bold;
 }
 
+.post__like {
+    color: black;
+    transition: color 0.2s ease-in-out;
+}
+
 .post__like:hover {
     color: red;
+}
+
+.post__like--liked {
+    color: red;
+}
+
+.post__like--liked:hover {
+    color: black;
 }
 
 

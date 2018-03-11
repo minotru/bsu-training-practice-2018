@@ -51,7 +51,7 @@ export default class PhotoPosts {
     }
 
     getAllPosts() {
-        return this.photoPosts;
+        return this.photoPosts.slice();
     }
 
     getPhotoPostsCnt() {

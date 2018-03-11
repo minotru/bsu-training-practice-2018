@@ -1,7 +1,8 @@
-export function editPost(postId) {
+export function editPost(postId, options) {
     return {
         type: "EDIT_POST",
-        postId
+        postId,
+        options
     }
 }
 
