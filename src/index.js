@@ -1,18 +1,105 @@
 import * as models from "./models"
 import PhotoPost from "./components/PhotoPost"
-import Store from "./store"
-import reducer from "./reducers"
-import * as actions from "./actions"
 import {removeChildren} from "./util"
+import NoPostsFound from "./components/PostsNotFound";
 
-const initalState = {
+//todo: hide/show elements depending on the current user
+
+const state = {
     posts: new models.PhotoPosts(),
-    filterOptions: null,
+    postNodesCash: {},
+    filterConfig: null,
     postsToShow: [],
-    userName: "simon_karasik",
+    userName: null,
+    postsWrapper: document.getElementById("posts")
 }
 
-const store = new Store(reducer, initalState);
+if (!state.userName) {
+    document.querySelector(".header__user").className += " hidden";
+    // document.querySelector(".")
+}
+else
+    document.querySelector(".header__user__name").textContent = state.userName;
+
+const showPosts = function(posts) {
+    removeChildren(state.postsWrapper);
+    if (posts.length === 0)
+        state.postsWrapper.appendChild(NoPostsFound());
+    else
+        posts.forEach(post => state.postsWrapper.appendChild(state.postNodesCash[post.id])); 
+}
+
+const addPost = function(post) {
+    post = new models.PhotoPost(post);
+    if (state.posts.addPhotoPost(post)) {
+        state.postNodesCash[post.id] = PhotoPost({
+            post, 
+            userName: state.userName});
+        showPosts(state.posts.getPhotoPosts());
+        return true;
+    }
+    return false;
+}
+
+const removePost = function(id) {
+    if (state.posts.removePhotoPost()) {
+        const node = state.postNodesCash[id];
+        if (node.parentNode) 
+            node.parentNode.removeChild(node);
+        delete state.postNodesCash.id;
+        return true;
+    }
+    return false;
+}
+
+const cashPostsIfNeeded = function(posts) {
+    posts.forEach(post => {
+        if (!state.postNodesCash[post.id])
+            state.postNodesCash[post.ind] = PhotoPost({post, userName: state.userName});
+    })
+}
+
+const filterPosts = function(filterConfig) {
+    const posts = state.posts.getPhotoPosts(0, 10, filterConfig);
+    cashPostsIfNeeded(posts);
+    showPosts(posts);
+}
+
+const updatePost = function(id) {
+    const oldNode = state.postNodesCash[id];
+    const node = PhotoPost({
+        post: state.posts.getPhotoPost(id), 
+        userName: state.userName});
+    state.postNodesCash[id] = node;
+    if (oldNode && oldNode.parentNode)
+        oldNode.parentNode.replaceChild(node, oldNode);
+}
+
+const editPost = function(id, options) {
+    if (state.posts.editPhotoPost(id, options)) {
+        updatePost(id);
+        return true;
+    }
+    return false;
+}
+
+const likePost = function(id) {
+    const post  = state.posts.getPhotoPost(id);
+    if (post) {
+        post.like(state.userName);
+        updatePost(id);
+        return true;
+    }
+    return false;
+}
+
+Object.assign(window, {
+    addPost, 
+    editPost, 
+    removePost, 
+    likePost,
+    filterPosts
+});
 
 const examplePosts = [
     {
@@ -40,28 +127,4 @@ const examplePosts = [
     }
 ].map(postData => new models.PhotoPost(postData));
 
-const postsHandler = (function() {
-    let nodesCash = {};
-    let postsToShow = null;
-    const wrapper = document.getElementById("posts");
-    return function() {
-        if (store.getState().postsToShow !== postsToShow) {
-            postsToShow = store.getState().postsToShow;
-            removeChildren(wrapper);
-            postsToShow.forEach(post => {
-                if (!nodesCash[post.id] || nodesCash[post.id].data.post !== post)
-                    nodesCash[post.id] = PhotoPost({
-                        post,
-                        userName: store.getState().userName,
-                        onRemove: () => store.dispatch(actions.removePost(post.id)),
-                        onEdit: () => store.dispatch(actions.editPost(post.id))
-                    });
-                wrapper.appendChild(nodesCash[post.id]);
-            });
-        }
-    
-    }
-})();
-
-store.subscribe(postsHandler);
-examplePosts.forEach(post => store.dispatch(actions.addPost(post)));
+examplePosts.forEach(post => addPost(post));

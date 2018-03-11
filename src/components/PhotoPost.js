@@ -1,6 +1,5 @@
 import {stringToDOMElement, addClassIf} from "../util"
 import {PhotoPost as PhotoPostModel} from "../models/PhotoPost"
-import {editPost, deletePost} from "../actions"
 
 /**
  * @param {PhotoPostModel} post
@@ -49,8 +48,6 @@ export default function PhotoPost({post, onEdit, onRemove, userName, onLike} ) {
 
     element.querySelector(".post__header__edit").onclick = onEdit
     element.querySelector(".post__header__remove").onclick = onRemove;
-    element.data = {};
-    element.data.post = post;
 
     return element;
 }

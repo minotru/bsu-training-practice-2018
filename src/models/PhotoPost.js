@@ -26,23 +26,16 @@ export default class PhotoPost {
     }
 
     /**
-     * Like this post. Calling twice with same userName wont give changes. 
+     * Like this post. Calling twice with same userName will unlike 
      * @param {String} userName User who liked this post.
      */
     like(userName) {
-        if(this.likes.indexOf(userName) === -1)
-            this.likes.push(userName);
-    } 
-
-     /**
-     * Dislike this post. Calling twice with same userName wont give changes. 
-     * @param {String} userName User who liked this post.
-     */
-    dislike(userName) {
         const ind = this.likes.indexOf(userName);
-        if (ind !== -1)
+        if (ind === -1)
+            this.likes.push(userName);
+        else
             this.likes.splice(ind, 1);
-    }
+    } 
 
     static nextId() {
         let id = 0;
