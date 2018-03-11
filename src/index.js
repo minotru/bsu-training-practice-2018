@@ -1,7 +1,21 @@
 import * as models from "./models"
 import PhotoPost from "./components/PhotoPost"
+import Store from "./store"
+import reducer from "./reducers"
+import * as actions from "./actions"
+import {removeChildren} from "./util"
 
-const postsData = [
+const initalState = {
+    posts: new models.PhotoPosts(),
+    filterOptions: null,
+    postsToShow: [],
+    userName: "simon_karasik",
+    postsChangeCnt: 0
+}
+
+const store = new Store(reducer, initalState);
+
+const examplePosts = [
     {
         author: "simon_karasik",
         description: "That was a wonderful sunset in the middle of summer.",
@@ -25,10 +39,30 @@ const postsData = [
         photoLink: "http://google.ru",
         tags: ["hello", "it's", "me", "tag2"]
     }
-];
+].map(postData => new models.PhotoPost(postData));
 
-const posts = new models.PhotoPosts();
-postsData.forEach(post => posts.addPhotoPost(new models.PhotoPost(post))); 
-const post = PhotoPost(posts.getPhotoPost("0"));
-const postsElement = document.getElementById("posts");
-posts.getPhotoPosts().forEach(post => postsElement.appendChild(PhotoPost(post)));
+const postsHandler = (function() {
+    let nodesCash = {};
+    let postsChangeCnt = null;
+    const wrapper = document.getElementById("posts");
+    return function() {
+        if (store.getState().postsChangeCnt !== postsChangeCnt) {
+            postsChangeCnt = store.getState().postsChangeCnt;
+            removeChildren(wrapper);
+            store.getState().postsToShow.forEach(post => {
+                if (!nodesCash[post.id] || nodesCash[post.id].data.post !== post)
+                    nodesCash[post.id] = PhotoPost({
+                        post,
+                        userName: store.getState().userName,
+                        onRemove: () => store.dispatch(actions.removePost(post.id)),
+                        onEdit: () => store.dispatch(actions.editPost(post.id))
+                    });
+                wrapper.appendChild(nodesCash[post.id]);
+            });
+        }
+    
+    }
+})();
+
+store.subscribe(postsHandler);
+examplePosts.forEach(post => store.dispatch(actions.addPost(post)));

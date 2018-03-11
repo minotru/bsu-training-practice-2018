@@ -1,11 +1,13 @@
-import {stringToDOMElement} from "../util"
+import {stringToDOMElement, addClassIf} from "../util"
 import {PhotoPost as PhotoPostModel} from "../models/PhotoPost"
+import {editPost, deletePost} from "../actions"
 
 /**
  * @param {PhotoPostModel} post
+ * @param {Store} store
  */
 
-export default function PhotoPost(post) {
+export default function PhotoPost({post, onEdit, onRemove, userName} ) {
     const pad = s => new String(s).padStart(2, '0'); 
     const formatDate = date => pad(date.getDate()) + "." + pad(date.getMonth() + 1) + "." + pad(date.getFullYear() % 100);
     const makeTag = tag => `<a class="post__tag">#${tag}</a>`;
@@ -13,6 +15,8 @@ export default function PhotoPost(post) {
         if (tags)
             return tags.reduce((s, tag) => s + makeTag(tag) + "\n", "");
     };
+    const isAuthor = userName == post.author;
+    const isLiked = post.likes.indexOf(userName) !== -1; 
 
     const element =  stringToDOMElement(
     `<div class="post">
@@ -20,15 +24,17 @@ export default function PhotoPost(post) {
             <span class="post__author">${post.author}</span>
             <span class="post__header__right">
                 <span class="post__date">${formatDate(post.createdAt)}</span>&nbsp
-                <i class="material-icons">create</i>
-                <i class="material-icons">close</i>
+                <span class = ${addClassIf(!isAuthor, "hidden")}>
+                    <i class="material-icons icon-button post__header__edit">create</i>
+                    <i class="material-icons icon-button post__header__remove">close</i>
+                </span>
             </span>
         </header>
         <img class="post__photo" src="${post.photoLink}">
         <footer class="post__footer">
             <div class="post__like-panel">
                     <a class="post__like">
-                        <i class="material-icons">favorite</i>
+                        <i class="material-icons ${addClassIf(isLiked, "post__like--liked")}">favorite</i>
                     </a>
                 <span class="post__likes-count">${post.likes.length}</span>
             </div>
@@ -42,6 +48,11 @@ export default function PhotoPost(post) {
             </div>
         </footer>
     </div>`);
+
+    element.querySelector(".post__header__edit").onclick = onEdit
+    element.querySelector(".post__header__remove").onclick = onRemove;
+    element.data = {};
+    element.data.post = post;
 
     return element;
 }

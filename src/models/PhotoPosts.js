@@ -50,6 +50,10 @@ export default class PhotoPosts {
         return true;
     }
 
+    getAllPosts() {
+        return this.photoPosts;
+    }
+
     getPhotoPostsCnt() {
         return this.photoPosts.length;
     }

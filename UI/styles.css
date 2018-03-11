@@ -15,6 +15,14 @@ html, body {
     background-color: #f7f6f6;
 }
 
+.not-display {
+    display: none;
+}
+
+.hidden {
+    visibility: hidden; 
+}
+
 .button {
     border: 2px solid silver;
     border-radius: 0.2em;
@@ -24,6 +32,15 @@ html, body {
 .button:hover {
     border-color: #d8a84a;
     background-color:whitesmoke;
+}
+
+.icon-button {
+    transition: color 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    color: #d8a84a;
 }
 
 .font--menu {
