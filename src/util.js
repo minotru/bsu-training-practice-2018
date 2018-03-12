@@ -11,6 +11,24 @@ export function addClassIf(condition, className, elseClassName = "") {
         return (" " + elseClassName);
 }
 
+export function renderIf(condition, html) {
+    if (condition)
+        return html;
+}
+
+/**
+ * 
+ * @param {[Element]} elements 
+ * @param {Element} wrapper 
+ * @returns {Element} Rendered element.
+ */
+export function render(elements, wrapper) {
+    if (!Array.isArray(elements))
+        elements = [elements];
+    elements.forEach(element => wrapper.appendChild(element));
+    return wrapper;
+}
+
 /**
  * 
  * @param {Node} element 

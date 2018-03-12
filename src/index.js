@@ -1,7 +1,8 @@
 import * as models from "./models"
 import PhotoPost from "./components/PhotoPost"
-import {removeChildren} from "./util"
-import NoPostsFound from "./components/PostsNotFound";
+import PostsNotFound from "./components/PostsNotFound";
+import App from "./components/App"
+import {removeChildren, render} from "./util"
 
 //todo: hide/show elements depending on the current user
 
@@ -10,21 +11,19 @@ const state = {
     postNodesCash: {},
     filterConfig: null,
     postsToShow: [],
-    userName: null,
-    postsWrapper: document.getElementById("posts")
+    user: {
+        name: "simon_karasik",
+        avatarLink: "avatar.jpg",
+    },
 }
 
-if (!state.userName) {
-    document.querySelector(".header__user").className += " hidden";
-    // document.querySelector(".")
-}
-else
-    document.querySelector(".header__user__name").textContent = state.userName;
+render(App({user:state.user}), document.body);
+state.postsWrapper = document.getElementById("posts");
 
 const showPosts = function(posts) {
     removeChildren(state.postsWrapper);
     if (posts.length === 0)
-        state.postsWrapper.appendChild(NoPostsFound());
+        state.postsWrapper.appendChild(PostsNotFound());
     else
         posts.forEach(post => state.postsWrapper.appendChild(state.postNodesCash[post.id])); 
 }
@@ -55,7 +54,7 @@ const removePost = function(id) {
 const cashPostsIfNeeded = function(posts) {
     posts.forEach(post => {
         if (!state.postNodesCash[post.id])
-            state.postNodesCash[post.ind] = PhotoPost({post, userName: state.userName});
+            state.postNodesCash[post.ind] = PhotoPost({post, userName: (state.user ? state.user.name : null)});
     })
 }
 
@@ -69,7 +68,7 @@ const updatePost = function(id) {
     const oldNode = state.postNodesCash[id];
     const node = PhotoPost({
         post: state.posts.getPhotoPost(id), 
-        userName: state.userName});
+        userName: state.user ? state.user.name : undefined});
     state.postNodesCash[id] = node;
     if (oldNode && oldNode.parentNode)
         oldNode.parentNode.replaceChild(node, oldNode);
