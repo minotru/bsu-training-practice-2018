@@ -33,7 +33,7 @@ const addPost = function(post) {
     if (state.posts.addPhotoPost(post)) {
         state.postNodesCash[post.id] = PhotoPost({
             post, 
-            userName: state.userName});
+            userName: state.user.name});
         showPosts(state.posts.getPhotoPosts());
         return true;
     }
@@ -85,7 +85,7 @@ const editPost = function(id, options) {
 const likePost = function(id) {
     const post  = state.posts.getPhotoPost(id);
     if (post) {
-        post.like(state.userName);
+        post.like(state.user.name);
         updatePost(id);
         return true;
     }
