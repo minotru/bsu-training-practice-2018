@@ -1,12 +1,12 @@
-import * as models from './models';
+import { PhotoPosts as PhotoPostsModel } from './models';
 import PhotoPost from './components/PhotoPost';
 import PostsNotFound from './components/PostsNotFound';
 import App from './components/App';
 import { removeChildren, render } from './util';
 
 const state = {
-  posts: new models.PhotoPosts(),
-  postNodesCash: {},
+  posts: new PhotoPostsModel(),
+  postNodesCache: {},
   filterConfig: null,
   postsToShow: [],
   user: {
@@ -24,17 +24,19 @@ const showPosts = function (posts) {
     state.postsWrapper.appendChild(PostsNotFound());
   } else {
     posts.forEach((post) => {
-      if (!state.postNodesCash[post.id]) {
-        state.postNodesCash[post.id] = PhotoPost({ post, user: state.user });
+      if (!state.postNodesCache[post.id]) {
+        state.postNodesCache[post.id] = PhotoPost({
+          post, 
+          user: state.user, 
+        });
       }
-      state.postsWrapper.appendChild(state.postNodesCash[post.id]);
+      state.postsWrapper.appendChild(state.postNodesCache[post.id]);
     });
   }
 };
 
 const addPost = function (postObj) {
-  const post = new models.PhotoPost(postObj);
-  if (state.posts.addPhotoPost(post)) {
+  if (state.posts.addPhotoPost(postObj)) {
     showPosts(state.posts.getPhotoPosts());
     return true;
   }
@@ -43,44 +45,34 @@ const addPost = function (postObj) {
 
 const removePost = function (id) {
   if (state.posts.removePhotoPost()) {
-    const node = state.postNodesCash[id];
+    const node = state.postNodesCache[id];
     if (node.parentNode) {
       node.parentNode.removeChild(node);
     }
-    delete state.postNodesCash.id;
+    delete state.postNodesCache.id;
     return true;
   }
   return false;
 };
 
-const cashPostsIfNeeded = function (posts) {
-  posts.forEach((post) => {
-    if (!state.postNodesCash[post.id]) {
-      state.postNodesCash[post.ind] =
-        PhotoPost({ post, userName: (state.user ? state.user.name : null) });
-    }
-  });
-};
-
 const filterPosts = function (filterConfig) {
   const posts = state.posts.getPhotoPosts(0, 10, filterConfig);
-  cashPostsIfNeeded(posts);
   showPosts(posts);
 };
 
 const updatePost = function (id) {
-  if (state.postNodesCash[id].parentNode) {
-    const oldNode = state.postNodesCash[id];
+  if (state.postNodesCache[id].parentNode) {
+    const oldNode = state.postNodesCache[id];
     const node = PhotoPost({
       post: state.posts.getPhotoPost(id),
       user: state.user,
     });
-    state.postNodesCash[id] = node;
+    state.postNodesCache[id] = node;
     if (oldNode && oldNode.parentNode) {
       oldNode.parentNode.replaceChild(node, oldNode);
     }
   } else {
-    state.postNodesCash[id] = null;
+    state.postNodesCache[id] = null;
   }
 };
 
@@ -134,6 +126,6 @@ const examplePosts = [
     photoLink: 'https://scontent-frx5-1.cdninstagram.com/vp/a0915c1f5dc07ee4b473032fd81a4b11/5B3A2469/t51.2885-15/e35/26864741_2070912839806455_6365971865814433792_n.jpg',
     tags: ['hello', "it's", 'me', 'tag2'],
   },
-].map(postData => new models.PhotoPost(postData));
+];
 
 examplePosts.forEach(post => addPost(post));

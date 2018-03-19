@@ -47,7 +47,11 @@ export default class PhotoPosts {
   * @param {PhotoPost} post
   * @returns {Boolean} success / failure
   */
-  addPhotoPost(post) {
+  addPhotoPost(_post) {
+    let post = _post;
+    if (!(post instanceof PhotoPost)) {
+      post = new PhotoPost(_post);
+    }
     if (!PhotoPost.validate(post)) {
       return false;
     }

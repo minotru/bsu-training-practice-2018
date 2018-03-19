@@ -41,7 +41,7 @@ export default class PhotoPost {
   }
 
   static nextId() {
-    return id++;
+    return (id++).toString();
   }
 
   /**
