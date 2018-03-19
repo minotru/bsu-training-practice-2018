@@ -4,7 +4,7 @@
   "description": "The bsu training prectice from Exadel task repo",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+  "test": "test"
   },
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/minotru/bsu-training-practice-2018/issues"
+  "url": "https://github.com/minotru/bsu-training-practice-2018/issues"
   },
   "homepage": "https://github.com/minotru/bsu-training-practice-2018#readme",
   "dependencies": {
@@ -25,6 +25,8 @@
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
     "css-loader": "^0.28.10",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.9.0",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.20.2",

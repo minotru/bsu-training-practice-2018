@@ -1,2 +1,2 @@
-export {default as PhotoPost} from "./PhotoPost";
-export {default as PhotoPosts} from "./PhotoPosts";
+export { default as PhotoPost } from './PhotoPost';
+export { default as PhotoPosts } from './PhotoPosts';

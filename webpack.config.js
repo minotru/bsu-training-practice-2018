@@ -1,5 +1,5 @@
-const webpack = require('webpack')
-const path = require('path')
+const webpack = require('webpack');
+const path = require('path');
 
 /*
  * We've enabled UglifyJSPlugin for you! This minifies your app
@@ -12,28 +12,13 @@ const path = require('path')
 // const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 
-
-
 module.exports = {
-  entry: "./src/index",
+  entry: './src/index',
 
   output: {
     filename: 'bundle.js',
-    path: __dirname + "/UI/"
+    path: `${__dirname  }/UI/`,
   },
-  mode: "development",
+  mode: 'development',
+};
 
-//   module: {
-//     rules: [{
-//       test: /\.js$/,
-//       exclude: /node_modules/,
-//       loader: 'babel-loader',
-
-//       options: {
-//         presets: ['env']
-//       }
-//     }]
-//   },
-
-	// plugins: [new UglifyJSPlugin()]
-}

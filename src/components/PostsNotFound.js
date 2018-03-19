@@ -1,9 +1,9 @@
-import {stringToDOMElement} from "../util"
+import { stringToDOMElement } from '../util';
 
 export default function PostsNotFound() {
-    const element = stringToDOMElement(
-    `<div class = "post">
-        No posts found.
+  const element = stringToDOMElement(`
+    <div class = "post">
+      No posts found.
     </div>`);
-    return element;
+  return element;
 }
