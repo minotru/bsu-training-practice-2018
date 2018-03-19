@@ -14,5 +14,6 @@ export default function Footer() {
         Last update:
          <span id="update-date">19.02.18</span>
       </span>
-    </footer>`);
+    </footer>
+    `.trim());
 }

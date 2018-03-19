@@ -40,7 +40,8 @@ export default function PhotoPost({ post, onEdit, onRemove, user, onLike }) {
          </p>
        </div>
       </footer>
-    </div>`);
+    </div>
+    `.trim());
   element.querySelector('.post__header__edit').onclick = onEdit;
   element.querySelector('.post__header__remove').onclick = onRemove;
   element.querySelector('.post__like').onclick = onLike;

@@ -198,10 +198,8 @@ body {
    position: absolute;
    display: none;
    top: 100%;
-   margin-top: 2px;
    background-color: white;
    border: 2px solid silver;
-   border-top: 0;
    padding: 0.2em;
    border-radius: 0 0 0.2em 0.2em;
    left: 0;

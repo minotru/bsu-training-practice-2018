@@ -14,6 +14,6 @@ export default function Header({ user }) {
         </a>
       </div>
     </header>
-  `);
+  `.trim());
   return element;
 }
