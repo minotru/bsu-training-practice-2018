@@ -2,6 +2,8 @@ function isString(s) {
   return typeof s === 'string' || s instanceof String;
 }
 
+let id = 0;
+
 export default class PhotoPost {
 /**
   * @param {String} description
@@ -39,9 +41,7 @@ export default class PhotoPost {
   }
 
   static nextId() {
-    let id = 0;
-    this.nextId = () => (id++).toString();
-    return this.nextId();
+    return id++;
   }
 
   /**
