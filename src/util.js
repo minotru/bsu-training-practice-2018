@@ -12,6 +12,12 @@ export function renderIf(condition, html) {
   return condition ? html : '';
 }
 
+export function wrap(element) {
+  const wrapper = document.createElement('div');
+  wrapper.appendChild(element);
+  return wrapper;
+}
+
 /**
  *
  * @param {[Element]} elements
@@ -25,6 +31,20 @@ export function render(elements, wrapper) {
 
   elements.forEach(element => wrapper.appendChild(element));
   return wrapper;
+}
+
+/**
+ * @param {String} tag 
+ * @param {Object} props 
+ * @param {[Element]} children 
+ */
+export function createElement(tag, props, ...children) {
+  const element = document.createElement(tag);
+  Object.keys(props).forEach((propName) => {
+    element[propName] = props[propName]
+  });
+  children.forEach(child => element.appendChild(child));
+  return element;
 }
 
 /**

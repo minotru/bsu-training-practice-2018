@@ -1,106 +1,42 @@
 import { PhotoPosts as PhotoPostsModel } from './models';
-import PhotoPost from './components/PhotoPost';
-import PostsNotFound from './components/PostsNotFound';
 import App from './components/App';
-import { removeChildren, render } from './util';
+import { render } from './util';
+import { setState } from './state';
+import handle from './handlers';
 
-const state = {
+
+const initialState = {
+  page: 'app',
   posts: new PhotoPostsModel(),
-  postNodesCache: {},
   filterConfig: null,
-  postsToShow: [],
+  postsInViewCnt: 10,
   user: {
     name: 'simon_karasik',
     avatarLink: 'avatar.jpg',
   },
+  guestUser: {
+    name: 'Guest',
+    avatarLink: 'user_icon.jpg',
+    isGuest: true,
+  },
+  users: [
+    {
+      email: 'senich10@mail.ru',
+      password: '505137s',
+      avatarLink: 'avatar.jpg',
+      id: '1',
+    },
+    {
+      email: 'admin@example.org',
+      password: 'admin',
+      id: '0',
+    },
+  ],
 };
 
-render(App({ user: state.user }), document.body);
-state.postsWrapper = document.getElementById('posts');
+setState(initialState);
 
-const showPosts = function (posts) {
-  removeChildren(state.postsWrapper);
-  if (posts.length === 0) {
-    state.postsWrapper.appendChild(PostsNotFound());
-  } else {
-    posts.forEach((post) => {
-      if (!state.postNodesCache[post.id]) {
-        state.postNodesCache[post.id] = PhotoPost({
-          post, 
-          user: state.user, 
-        });
-      }
-      state.postsWrapper.appendChild(state.postNodesCache[post.id]);
-    });
-  }
-};
-
-const addPost = function (postObj) {
-  if (state.posts.addPhotoPost(postObj)) {
-    showPosts(state.posts.getPhotoPosts());
-    return true;
-  }
-  return false;
-};
-
-const removePost = function (id) {
-  if (state.posts.removePhotoPost()) {
-    const node = state.postNodesCache[id];
-    if (node.parentNode) {
-      node.parentNode.removeChild(node);
-    }
-    delete state.postNodesCache.id;
-    return true;
-  }
-  return false;
-};
-
-const filterPosts = function (filterConfig) {
-  const posts = state.posts.getPhotoPosts(0, 10, filterConfig);
-  showPosts(posts);
-};
-
-const updatePost = function (id) {
-  if (state.postNodesCache[id].parentNode) {
-    const oldNode = state.postNodesCache[id];
-    const node = PhotoPost({
-      post: state.posts.getPhotoPost(id),
-      user: state.user,
-    });
-    state.postNodesCache[id] = node;
-    if (oldNode && oldNode.parentNode) {
-      oldNode.parentNode.replaceChild(node, oldNode);
-    }
-  } else {
-    state.postNodesCache[id] = null;
-  }
-};
-
-const editPost = function (id, options) {
-  if (state.posts.editPhotoPost(id, options)) {
-    updatePost(id);
-    return true;
-  }
-  return false;
-};
-
-const likePost = function (id) {
-  const post = state.posts.getPhotoPost(id);
-  if (post) {
-    post.like(state.user.name);
-    updatePost(id);
-    return true;
-  }
-  return false;
-};
-
-Object.assign(window, {
-  addPost,
-  editPost,
-  removePost,
-  likePost,
-  filterPosts,
-});
+render(App(), document.body);
 
 const examplePosts = [
   {
@@ -128,4 +64,7 @@ const examplePosts = [
   },
 ];
 
-examplePosts.forEach(post => addPost(post));
+examplePosts.forEach(post => handle({
+  type: 'ADD_POST',
+  post,
+}));

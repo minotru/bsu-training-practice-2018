@@ -10,7 +10,7 @@ export default function Footer() {
         </a>
         ,&nbsp FAMCS, group 5
       </span>
-      <span class="footer__updat bright">
+      <span class="footer__update bright">
         Last update:
          <span id="update-date">19.02.18</span>
       </span>

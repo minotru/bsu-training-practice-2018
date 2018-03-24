@@ -1,11 +1,14 @@
 import { stringToDOMElement } from '../util';
+import { getState } from '../state';
+import handle from '../handlers';
 
-export default function Header({ user }) {
+export default function Header() {
+  const { user } = getState();
   const element = stringToDOMElement(`
     <header class="header panel">
       <div class="header__user-wrapper header__sideblock header__user">
-        <img class="header__user__avatar" src="${user ? user.avatarLink : 'user_icon.png'}"> &nbsp
-        <span class="header__user__name">${user ? user.name : 'Guest'}</span>
+        <img class="header__user__avatar" src="${user.avatarLink}"> &nbsp
+        <span class="header__user__name">${user.name}</span>
       </div>
       <h1 class="header__title">IMPRESSION</h1>
       <div class="header__sideblock header__logout-wrapper">
@@ -15,5 +18,12 @@ export default function Header({ user }) {
       </div>
     </header>
   `.trim());
+
+  element.querySelector('.header__logout').onclick = () => {
+    handle({
+      type: 'LOGOUT',
+    });
+  };
+
   return element;
 }

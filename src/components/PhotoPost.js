@@ -1,18 +1,20 @@
 import { stringToDOMElement, addClassIf } from '../util';
+import handle from '../handlers';
+import { getState } from '../state';
 /**
  * @param {PhotoPostModel} post
  * @param {Store} store
  */
 
-export default function PhotoPost({ post, onEdit, onRemove, user, onLike }) {
+export default function PhotoPost({ post }) {
+  const { user } = getState();
   const pad = s => new String(s).padStart(2, '0');
   const formatDate = date => pad(date.getDate()) + '.' + pad(date.getMonth() + 1) + '.' + pad(date.getFullYear() % 100);
   const makeTag = tag => `<a class="post__tag">#${tag}</a>`;
   const makeTags = tags =>
-    tags.reduce((s, tag) => s + makeTag(tag) + '\n', '');
-  const userName = user ? user.name : null;
-  const isAuthor = userName;
-  const isLiked = post.likes.indexOf(userName) !== -1;
+    tags.reduce((s, tag) => s + makeTag(tag), '');
+  const isAuthor = user.isGuest || post.author === user.name;
+  const isLiked = user.isGuest || post.likes.indexOf(user.name) !== -1;
   const element = stringToDOMElement(`
     <div class="post">
       <header class="post__header">
@@ -27,13 +29,15 @@ export default function PhotoPost({ post, onEdit, onRemove, user, onLike }) {
       </header>
       <img class="post__photo" src="${post.photoLink}">
       <footer class="post__footer">
-       <div class="post__like-panel">
-         <i class="material-icons post__like ${addClassIf(isLiked, 'post__like--liked')}">favorite</i>
+        <div class="post__like-panel">
+          <i class="material-icons post__like ${addClassIf(isLiked, 'post__like--liked')}">
+            ${isLiked ? 'favorite' : 'favorite_border'}
+          </i>
          <span class="post__likes-count">${post.likes.length}</span>
        </div>
        <div class="post__information">
          <div class="post__tags">
-          ${post.tags ? makeTags(post.tags) : ''}
+          ${makeTags(post.tags)}
          </div>
          <p class="post__description">
           ${post.description}
@@ -42,8 +46,24 @@ export default function PhotoPost({ post, onEdit, onRemove, user, onLike }) {
       </footer>
     </div>
     `.trim());
-  element.querySelector('.post__header__edit').onclick = onEdit;
-  element.querySelector('.post__header__remove').onclick = onRemove;
-  element.querySelector('.post__like').onclick = onLike;
+  element.querySelector('.post__header__edit').onclick = () => {
+    handle({
+      type: 'EDIT_POST',
+      id: post.id,
+    });
+  };
+  element.querySelector('.post__header__remove').onclick = () => {
+    handle({
+      type: 'REMOVE_POST',
+      id: post.id,
+    });
+  };
+  element.querySelector('.post__like').onclick = () => {
+    handle({
+      type: 'LIKE_POST',
+      id: post.id,
+    });
+  };
+  element.setAttribute('data-id', post.id);
   return element;
 }
