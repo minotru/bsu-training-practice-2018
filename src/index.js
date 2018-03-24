@@ -9,7 +9,7 @@ const initialState = {
   page: 'app',
   posts: new PhotoPostsModel(),
   filterConfig: null,
-  postsInViewCnt: 10,
+  postsInViewCnt: 1,
   user: {
     name: 'simon_karasik',
     avatarLink: 'avatar.jpg',

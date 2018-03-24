@@ -169,7 +169,13 @@ body {
    margin: 0.2em;
    margin-left: 0;
    flex: 1;
-   
+   flex-direction: column;
+   text-align: left;
+}
+
+.search__option--date {
+    display: flex;
+    justify-content: space-between;
 }
 
 .search {

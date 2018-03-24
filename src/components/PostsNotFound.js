@@ -4,6 +4,7 @@ export default function PostsNotFound() {
   const element = stringToDOMElement(`
     <div class = "post">
       No posts found.
-    </div>`);
+    </div>
+  `.trim());
   return element;
 }

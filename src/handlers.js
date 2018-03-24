@@ -12,8 +12,12 @@ function addPost(postObj) {
     return true;
   }
   return false;
-};
+}
 
+function showMorePosts() {
+  getState().postsInViewCnt +=  10;
+  showPosts();
+}
 function removePost(id) {
   if (getState().posts.removePhotoPost(id)) {
     PhotoPosts.remove(id);
@@ -24,6 +28,7 @@ function removePost(id) {
 
 function filterPosts(filterConfig) {
   getState().filterConfig = filterConfig;
+  getState().postsInViewCnt = 10;
   showPosts();
 };
 
@@ -62,6 +67,9 @@ export default function handle(action) {
       break;
     case 'FILTER_POSTS':
       filterPosts(action.filterConfig);
+      break;
+    case 'SHOW_MORE_POSTS':
+      showMorePosts();
       break;
     case 'LOGOUT':
       logout();
