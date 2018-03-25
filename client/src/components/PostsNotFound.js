@@ -2,7 +2,7 @@ import { stringToDOMElement } from '../util';
 
 export default function PostsNotFound() {
   const element = stringToDOMElement(`
-    <div class = "post">
+    <div class = "post posts-not-found">
       No posts found.
     </div>
   `.trim());

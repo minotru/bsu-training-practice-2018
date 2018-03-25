@@ -3,7 +3,11 @@ import { getState } from '../state';
 import handle from '../handlers';
 
 export default function Header() {
-  const { user } = getState();
+  const user = getState().user || {
+    name: 'Guest',
+    avatarLink: 'user_icon.png',
+  };
+  
   const element = stringToDOMElement(`
     <header class="header panel">
       <div class="header__user-wrapper header__sideblock header__user">
@@ -22,6 +26,10 @@ export default function Header() {
   element.querySelector('.header__logout').onclick = () => {
     handle({
       type: 'LOGOUT',
+    });
+    handle({
+      type: 'SET_PAGE',
+      pageName: 'signIn',
     });
   };
 

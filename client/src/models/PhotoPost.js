@@ -2,7 +2,7 @@ function isString(s) {
   return typeof s === 'string' || s instanceof String;
 }
 
-let id = 0;
+let idCnt = 0;
 
 export default class PhotoPost {
 /**
@@ -13,8 +13,8 @@ export default class PhotoPost {
   * @param {[String]} tags
   * @param {[String]} likes
   */
-  constructor({ description, createdAt, author, photoLink, tags = [], likes = [] }) {
-    this.id = PhotoPost.nextId();
+  constructor({ description, createdAt, author, photoLink, tags = [], likes = [], id = ''}) {
+    this.id = id || PhotoPost.nextId();
     this.description = description;
     this.createdAt = createdAt;
     this.author = author;
@@ -41,7 +41,7 @@ export default class PhotoPost {
   }
 
   static nextId() {
-    return (id++).toString();
+    return (idCnt++).toString();
   }
 
   /**

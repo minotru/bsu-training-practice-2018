@@ -6,6 +6,11 @@ export default class PhotoPosts {
     this.isSorted = true;
   }
 
+  static fromArray(arr) {
+    const posts = new PhotoPosts();
+    arr.forEach(post => posts.addPhotoPost(post));
+    return posts;
+  }
 
   /**
   * @param {number} skip

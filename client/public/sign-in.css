@@ -1,5 +1,4 @@
 .sign-in {
-    /* width: 100%; */
     height: 100vh;
     position: relative;
     display: flex;
@@ -8,23 +7,15 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-.sign-in::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: url("sign-in-background.jpg") no-repeat fixed center;
-    background-size: 100% 100%;
-    opacity: 0.75;
-    z-index: -1;
+    background: lightgoldenrodyellow;
 }
 
 .sign-in__content {
     flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 83.333%;
 }
 
 .sign-in__form {
@@ -34,22 +25,17 @@
     background: rgba(255, 255, 255, 0.8);
     border-radius: 0.4em;
     padding: 2em;
+    border: 2px solid lightgray;
+    margin-bottom: 1em;
 }
 
 .sign-in__input {
     margin: 0.2em;
-    border-radius: 0.2em;
-    border: 2px solid #d8d3d3;
-    outline: none;
-}
-
-.sign-in__input:hover, .sign-in__input:focus {
-    border-color: #d8a84a;
 }
 
 .sign-in__header {
     font-family: "Julius Sans One", sans-serif;
-    font-size: 4em;
+    font-size: 3em;
     margin-top: 0.5em;
 }
 
@@ -58,6 +44,19 @@
     font-size: 1.2em;
 }
 
+.sign-in__button:last-child {
+    margin-top: 0;
+}
+
 .sign-in__footer {
     width: 100%;
+}
+
+@media (min-width: 820px) {
+    .sign-in__content {
+        width: 100%;
+    }
+    .sign-in__header {
+        font-size: 4em;
+    }
 }
