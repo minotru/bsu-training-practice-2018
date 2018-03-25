@@ -1,11 +1,11 @@
 import { getState, setState } from './state';
 import { removeChildren, render } from './util';
 import PhotoPosts from './components/PhotoPosts';
-import PhotoPost from './components/PhotoPost';
 import PageNotFound from './components/PageNotFound';
 import SignIn from './components/SignIn';
 import App from './components/App';
 import { default as PhotoPostModel } from './models/PhotoPost';
+import { get } from 'http';
 
 function showPosts() {
   const { posts, filterConfig, postsInViewCnt } = getState();
@@ -17,6 +17,7 @@ function addPost(postObj) {
     showPosts();
     return true;
   }
+  setState({ posts: getState().posts });
   return false;
 }
 
@@ -27,6 +28,7 @@ function showMorePosts() {
 function removePost(id) {
   if (getState().posts.removePhotoPost(id)) {
     PhotoPosts.remove(id);
+    setState({ posts: getState().posts });
     return true;
   }
   return false;
@@ -43,6 +45,7 @@ function likePost(id) {
   if (post) {
     post.like(getState().user.name);
     PhotoPosts.update(id, post);
+    setState({ posts: getState().posts });
     return true;
   }
   return false;
@@ -50,6 +53,7 @@ function likePost(id) {
 
 function editPost(id) {
   PhotoPosts.edit(id, getState().posts.getPhotoPost(id));
+  setState({ posts: getState().posts });
 }
 
 function createPost() {
@@ -71,6 +75,7 @@ function savePost(postObj, editor) {
     ));
     getState().posts.addPhotoPost(post);
   }
+  setState({ posts: getState().posts });
   PhotoPosts.save(post, editor);
 }
 
@@ -91,7 +96,8 @@ function setPage(pageName) {
 }
 
 function logout() {
-  getState().user = getState().guestUser;
+  getState().user = null;
+  setState({ user: getState().user });
 }
 
 function login({
@@ -102,13 +108,15 @@ function login({
   asGuest,
 }) {
   if (asGuest) {
-    getState().user = getState().guestUser;
+    getState().user = null;
+    setState({ user: getState().user });
     onLoggedIn();
   } else {
     const foundUser = getState().users.find(user =>
       (user.email === email && user.password === password));
     if (foundUser) {
       getState().user = foundUser;
+      setState({ user: getState().user });
       onLoggedIn();
     } else {
       onError();
@@ -134,7 +142,7 @@ export default function handle(action) {
       filterPosts(action.filterConfig);
       break;
     case 'SHOW_POSTS': {
-      getState().postsInViewCnt = 1;
+      getState().postsInViewCnt = 10;
       getState().filterConfig = null;
       showPosts();
       break;

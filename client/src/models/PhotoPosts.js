@@ -62,7 +62,7 @@ export default class PhotoPosts {
     }
     this.photoPosts.push(post);
     this.isSorted = false;
-    return true;
+    return post;
   }
 
   getAllPosts() {
