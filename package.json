@@ -1,7 +1,7 @@
 {
   "name": "bsu-training-practice-2018",
   "version": "1.0.0",
-  "description": "The bsu training prectice from Exadel task repo",
+  "description": "The bsu training practice from Exadel task repo",
   "main": "index.js",
   "scripts": {
   "test": "test"
