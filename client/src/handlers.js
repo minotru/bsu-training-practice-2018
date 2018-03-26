@@ -4,8 +4,27 @@ import PhotoPosts from './components/PhotoPosts';
 import PageNotFound from './components/PageNotFound';
 import SignIn from './components/SignIn';
 import App from './components/App';
+import Editor from './components/Editor';
 import { default as PhotoPostModel } from './models/PhotoPost';
-import { get } from 'http';
+
+function setPage(pageName, args) {
+  removeChildren(document.body);
+  let page = null;
+  switch (pageName) {
+    case 'signIn':
+      page = SignIn();
+      break;
+    case 'app':
+      page = App();
+      break;
+    case 'editor':
+      page = Editor(args);
+      break;
+    default:
+      page = PageNotFound();
+  }
+  render(page, document.body);
+}
 
 function showPosts() {
   const { posts, filterConfig, postsInViewCnt } = getState();
@@ -52,15 +71,14 @@ function likePost(id) {
 }
 
 function editPost(id) {
-  PhotoPosts.edit(id, getState().posts.getPhotoPost(id));
-  setState({ posts: getState().posts });
+  setPage('editor', getState().posts.getPhotoPost(id));
 }
 
 function createPost() {
-  PhotoPosts.create();
+  setPage('editor');
 }
 
-function savePost(postObj, editor) {
+function savePost(postObj) {
   let post;
   if (postObj.id) {
     getState().posts.editPhotoPost(postObj.id, postObj);
@@ -76,23 +94,7 @@ function savePost(postObj, editor) {
     getState().posts.addPhotoPost(post);
   }
   setState({ posts: getState().posts });
-  PhotoPosts.save(post, editor);
-}
-
-function setPage(pageName) {
-  removeChildren(document.body);
-  let page = null;
-  switch (pageName) {
-    case 'signIn':
-      page = SignIn();
-      break;
-    case 'app':
-      page = App();
-      break;
-    default:
-      page = PageNotFound();
-  }
-  render(page, document.body);
+  setPage('app');
 }
 
 function logout() {
@@ -155,6 +157,9 @@ export default function handle(action) {
       break;
     case 'SHOW_MORE_POSTS':
       showMorePosts();
+      break;
+    case 'CANCEL_EDITING':
+      setPage('app');
       break;
     case 'SET_PAGE':
       setPage(action.pageName);

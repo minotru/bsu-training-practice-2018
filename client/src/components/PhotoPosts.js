@@ -28,28 +28,21 @@ PhotoPosts.update = function (id, post) {
   }
 };
 
-PhotoPosts.edit = function (id, post) {
-  const node = findNode(id);
-  node.parentNode.replaceChild(EditPost(post, node), node);
-};
+// PhotoPosts.create = function () {
+//   element.removeChild(element.firstChild);
+//   element.appendChild(EditPost());
+// };
 
-PhotoPosts.save = function (post, editor) {
-  editor.parentNode.replaceChild(PhotoPost({ post }), editor);
-};
+// PhotoPosts.edit = function (post) {
+//   element.removeChild(element.firstChild);
+//   element.appendChild(EditPost(post));
+// };
 
 PhotoPosts.remove = function (id) {
   const node = findNode(id);
   if (node) {
     node.parentNode.removeChild(node);
   }
-};
-
-PhotoPosts.create = function () {
-  element.firstChild.insertBefore(
-    EditPost(undefined, null),
-    element.firstChild.firstChild,
-  );
-  window.scrollTo(0, 0);
 };
 
 PhotoPosts.render = function (posts) {

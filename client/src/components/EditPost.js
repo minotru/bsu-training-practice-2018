@@ -1,5 +1,4 @@
 import { stringToDOMElement } from '../util';
-import { getState } from '../state';
 import handle from '../handlers';
 
 function makeTag(tag) {
@@ -31,7 +30,7 @@ export default function EditPost(post = {
   tags: [],
   photoLink: '',
   description: '',
-}, postNode) {
+}) {
   const element = stringToDOMElement(`
     <div class="post">
       <form class="post__edit-form">
@@ -81,16 +80,19 @@ export default function EditPost(post = {
         photoLink,
         description,
       }),
-      editor: element,
     });
   };
 
   element.querySelector('#cancel').onclick = (event) => {
     event.preventDefault();
-    if (postNode) {
-      element.parentNode.replaceChild(postNode, element);
-    } else {
-      element.parentElement.removeChild(element);
+    handle({
+      type: 'CANCEL_EDITING',
+    });
+  };
+
+  element.querySelector('#photoLink').onkeypress = (event) => {
+    if (event.code === 'Enter') {
+      event.preventDefault();
     }
   };
 
