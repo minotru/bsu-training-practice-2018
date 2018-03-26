@@ -12,14 +12,14 @@ export default function Content() {
       <aside class="sidebar">
         <ul class="menu menu-panel">
           <li class="menu__item">
-            <a href="/posts" class="bright">Impressions</a>
+            <a href="#" class="bright">Impressions</a>
           </li>
           ${user ? `
           <li class="menu__item bright">
-            <a href="/posts/user" class="bright">My impressions</a>
+            <a href="#" class="bright">My impressions</a>
           </li>
           <li class="menu__item bright">
-            <a href="/posts/create" class="bright">New impression</a>
+            <a href="#" class="bright">New impression</a>
           </li>`.trim() : ''}
         </ul>
       </aside>

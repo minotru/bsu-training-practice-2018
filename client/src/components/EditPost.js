@@ -31,12 +31,12 @@ export default function EditPost(post = {
   tags: [],
   photoLink: '',
   description: '',
-}) {
+}, postNode) {
   const element = stringToDOMElement(`
     <div class="post">
       <form class="post__edit-form">
-        <img class="post__photo" src=${post.photoLink} />
-        <div>Photo link: <input id="photoLink" type="text" value=${post.photoLink} class="input"/></div>
+        <img class="post__photo" alt="Photo preview" src=${post.photoLink} />
+        <div>Photo link: <input id="photoLink" type="text" value="${post.photoLink}" class="input"/></div>
         <div class="post__tags">
           Tags:
           <span id="tags"></span>
@@ -49,6 +49,7 @@ export default function EditPost(post = {
           </div>
         </div>
         <button type="submit" class="input bright">Save</button>
+        <button id="cancel" class="input bright">Cancel</button>
     </div>
   `.trim());
   const tagsWrapper = element.querySelector('#tags');
@@ -82,6 +83,15 @@ export default function EditPost(post = {
       }),
       editor: element,
     });
+  };
+
+  element.querySelector('#cancel').onclick = (event) => {
+    event.preventDefault();
+    if (postNode) {
+      element.parentNode.replaceChild(postNode, element);
+    } else {
+      element.parentElement.removeChild(element);
+    }
   };
 
   return element;

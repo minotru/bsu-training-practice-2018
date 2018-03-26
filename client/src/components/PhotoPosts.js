@@ -30,7 +30,7 @@ PhotoPosts.update = function (id, post) {
 
 PhotoPosts.edit = function (id, post) {
   const node = findNode(id);
-  node.parentNode.replaceChild(EditPost(post), node);
+  node.parentNode.replaceChild(EditPost(post, node), node);
 };
 
 PhotoPosts.save = function (post, editor) {
@@ -46,10 +46,11 @@ PhotoPosts.remove = function (id) {
 
 PhotoPosts.create = function () {
   element.firstChild.insertBefore(
-    EditPost(),
+    EditPost(undefined, null),
     element.firstChild.firstChild,
   );
-}
+  window.scrollTo(0, 0);
+};
 
 PhotoPosts.render = function (posts) {
   removeChildren(element);

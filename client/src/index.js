@@ -14,7 +14,7 @@ const initialState = {
   users: exampleUsers,
 };
 
-if (window.localStorage.length > 0) {
+if (window.localStorage.getItem('posts')) {
   const rawPosts =
     JSON.parse(window.localStorage.getItem('posts'))
       .map(rawPost => Object.assign(

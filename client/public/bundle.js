@@ -2876,7 +2876,7 @@ PhotoPosts.update = function (id, post) {
 
 PhotoPosts.edit = function (id, post) {
   const node = findNode(id);
-  node.parentNode.replaceChild(Object(__WEBPACK_IMPORTED_MODULE_3__EditPost__["a" /* default */])(post), node);
+  node.parentNode.replaceChild(Object(__WEBPACK_IMPORTED_MODULE_3__EditPost__["a" /* default */])(post, node), node);
 };
 
 PhotoPosts.save = function (post, editor) {
@@ -2892,10 +2892,11 @@ PhotoPosts.remove = function (id) {
 
 PhotoPosts.create = function () {
   element.firstChild.insertBefore(
-    Object(__WEBPACK_IMPORTED_MODULE_3__EditPost__["a" /* default */])(),
+    Object(__WEBPACK_IMPORTED_MODULE_3__EditPost__["a" /* default */])(undefined, null),
     element.firstChild.firstChild,
   );
-}
+  window.scrollTo(0, 0);
+};
 
 PhotoPosts.render = function (posts) {
   Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* removeChildren */])(element);
@@ -5591,7 +5592,7 @@ const initialState = {
   users: __WEBPACK_IMPORTED_MODULE_3__data__["b" /* users */],
 };
 
-if (window.localStorage.length > 0) {
+if (window.localStorage.getItem('posts')) {
   const rawPosts =
     JSON.parse(window.localStorage.getItem('posts'))
       .map(rawPost => Object.assign(
@@ -5904,12 +5905,12 @@ function EditPost(post = {
   tags: [],
   photoLink: '',
   description: '',
-}) {
+}, postNode) {
   const element = Object(__WEBPACK_IMPORTED_MODULE_0__util__["d" /* stringToDOMElement */])(`
     <div class="post">
       <form class="post__edit-form">
-        <img class="post__photo" src=${post.photoLink} />
-        <div>Photo link: <input id="photoLink" type="text" value=${post.photoLink} class="input"/></div>
+        <img class="post__photo" alt="Photo preview" src=${post.photoLink} />
+        <div>Photo link: <input id="photoLink" type="text" value="${post.photoLink}" class="input"/></div>
         <div class="post__tags">
           Tags:
           <span id="tags"></span>
@@ -5922,6 +5923,7 @@ function EditPost(post = {
           </div>
         </div>
         <button type="submit" class="input bright">Save</button>
+        <button id="cancel" class="input bright">Cancel</button>
     </div>
   `.trim());
   const tagsWrapper = element.querySelector('#tags');
@@ -5955,6 +5957,15 @@ function EditPost(post = {
       }),
       editor: element,
     });
+  };
+
+  element.querySelector('#cancel').onclick = (event) => {
+    event.preventDefault();
+    if (postNode) {
+      element.parentNode.replaceChild(postNode, element);
+    } else {
+      element.parentElement.removeChild(element);
+    }
   };
 
   return element;
@@ -6087,14 +6098,14 @@ function Content() {
       <aside class="sidebar">
         <ul class="menu menu-panel">
           <li class="menu__item">
-            <a href="/posts" class="bright">Impressions</a>
+            <a href="#" class="bright">Impressions</a>
           </li>
           ${user ? `
           <li class="menu__item bright">
-            <a href="/posts/user" class="bright">My impressions</a>
+            <a href="#" class="bright">My impressions</a>
           </li>
           <li class="menu__item bright">
-            <a href="/posts/create" class="bright">New impression</a>
+            <a href="#" class="bright">New impression</a>
           </li>`.trim() : ''}
         </ul>
       </aside>
