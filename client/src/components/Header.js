@@ -3,10 +3,11 @@ import { getState } from '../state';
 import handle from '../handlers';
 
 export default function Header() {
-  const user = getState().user || {
+  let user = getState().user || {
     name: 'Guest',
     avatarLink: 'user_icon.png',
   };
+  user.avatarLink = user.avatarLink || 'user_icon.png';
   
   const element = stringToDOMElement(`
     <header class="header panel">

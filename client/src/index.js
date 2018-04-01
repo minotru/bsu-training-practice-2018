@@ -7,10 +7,7 @@ const initialState = {
   posts: PhotoPostsModel.fromArray(examplePosts),
   filterConfig: null,
   postsInViewCnt: 3,
-  user: {
-    name: 'simon_karasik',
-    avatarLink: 'avatar.jpg',
-  },
+  user: null,
   users: exampleUsers,
 };
 

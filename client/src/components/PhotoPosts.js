@@ -1,7 +1,6 @@
 import { stringToDOMElement, removeChildren } from '../util';
 import PhotoPost from './PhotoPost';
 import PostsNotFound from './PostsNotFound';
-import EditPost from './EditPost';
 
 let element;
 

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -147,10 +147,10 @@ function removeChildren(element) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_PageNotFound__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_SignIn__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_App__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_Editor__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_PageNotFound__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_SignIn__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_App__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_Editor__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__models_PhotoPost__ = __webpack_require__(3);
 
 
@@ -467,10 +467,8 @@ function Footer() {
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = PhotoPosts;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhotoPost__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PostsNotFound__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__EditPost__ = __webpack_require__(6);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhotoPost__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PostsNotFound__ = __webpack_require__(11);
 
 
 
@@ -537,116 +535,6 @@ PhotoPosts.render = function (posts) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = EditPost;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__handlers__ = __webpack_require__(1);
-
-
-
-function makeTag(tag) {
-  const element = Object(__WEBPACK_IMPORTED_MODULE_0__util__["d" /* stringToDOMElement */])(`
-    <span 
-      type="text" 
-      class="post__tag post__tag--editable input" 
-      contenteditable="true">
-      ${tag}
-    </span>&nbsp
-  `.trim());
-
-  element.onkeypress = (event) => {
-    if (event.code === 'Enter') {
-      event.preventDefault();
-      event.target.blur();
-    }
-  };
-
-  element.onblur = (event) => {
-    if (event.target.innerText.length === 0) {
-      event.target.parentNode.removeChild(event.target);
-    }
-  };
-  return element;
-}
-
-function EditPost(post = {
-  tags: [],
-  photoLink: '',
-  description: '',
-}) {
-  const element = Object(__WEBPACK_IMPORTED_MODULE_0__util__["d" /* stringToDOMElement */])(`
-    <div class="post">
-      <form class="post__edit-form">
-        <img class="post__photo" alt="Photo preview" src=${post.photoLink} />
-        <div>Photo link: <input id="photoLink" type="text" value="${post.photoLink}" class="input"/></div>
-        <div class="post__tags">
-          Tags:
-          <span id="tags"></span>
-          <a class="post__tag post__tag--add input">Add tag</a>
-        </div>
-        <div>
-          Description:
-          <div>
-            <textarea class="input post__description post__description--editable">${post.description}</textarea>
-          </div>
-        </div>
-        <button type="submit" class="input bright">Save</button>
-        <button id="cancel" class="input bright">Cancel</button>
-    </div>
-  `.trim());
-  const tagsWrapper = element.querySelector('#tags');
-  post.tags.forEach(tag => tagsWrapper.appendChild(makeTag(tag)));
-
-  element.querySelector('#photoLink').onblur = (event) => {
-    const url = event.target.value;
-    element.querySelector('.post__photo').src = url;
-  };
-
-  element.querySelector('.post__tag--add').onclick = () => {
-    const newTag = makeTag('');
-    tagsWrapper.appendChild(newTag);
-    newTag.focus();
-  };
-
-  element.querySelector('.post__edit-form').onsubmit = (event) => {
-    event.preventDefault();
-    const tags = Array.prototype.map.call(
-      element.querySelectorAll('.post__tag--editable'),
-      node => node.innerText,
-    );
-    const photoLink = element.querySelector('#photoLink').value;
-    const description = element.querySelector('.post__description').value;
-    Object(__WEBPACK_IMPORTED_MODULE_1__handlers__["a" /* default */])({
-      type: 'SAVE_POST',
-      post: Object.assign(post, {
-        tags,
-        photoLink,
-        description,
-      }),
-    });
-  };
-
-  element.querySelector('#cancel').onclick = (event) => {
-    event.preventDefault();
-    Object(__WEBPACK_IMPORTED_MODULE_1__handlers__["a" /* default */])({
-      type: 'CANCEL_EDITING',
-    });
-  };
-
-  element.querySelector('#photoLink').onkeypress = (event) => {
-    if (event.code === 'Enter') {
-      event.preventDefault();
-    }
-  };
-
-  return element;
-}
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Header;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
@@ -656,10 +544,11 @@ function EditPost(post = {
 
 
 function Header() {
-  const user = Object(__WEBPACK_IMPORTED_MODULE_1__state__["a" /* getState */])().user || {
+  let user = Object(__WEBPACK_IMPORTED_MODULE_1__state__["a" /* getState */])().user || {
     name: 'Guest',
     avatarLink: 'user_icon.png',
   };
+  user.avatarLink = user.avatarLink || 'user_icon.png';
   
   const element = Object(__WEBPACK_IMPORTED_MODULE_0__util__["d" /* stringToDOMElement */])(`
     <header class="header panel">
@@ -691,12 +580,12 @@ function Header() {
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__models__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__models__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__handlers__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__data__ = __webpack_require__(19);
@@ -709,10 +598,7 @@ const initialState = {
   posts: __WEBPACK_IMPORTED_MODULE_0__models__["a" /* PhotoPosts */].fromArray(__WEBPACK_IMPORTED_MODULE_3__data__["a" /* examplePosts */]),
   filterConfig: null,
   postsInViewCnt: 3,
-  user: {
-    name: 'simon_karasik',
-    avatarLink: 'avatar.jpg',
-  },
+  user: null,
   users: __WEBPACK_IMPORTED_MODULE_3__data__["b" /* users */],
 };
 
@@ -745,20 +631,20 @@ Object(__WEBPACK_IMPORTED_MODULE_2__handlers__["a" /* default */])({
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PhotoPost__ = __webpack_require__(3);
 /* unused harmony reexport PhotoPost */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhotoPosts__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhotoPosts__ = __webpack_require__(9);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_1__PhotoPosts__["a"]; });
 
 
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -889,7 +775,7 @@ class PhotoPosts {
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -969,7 +855,7 @@ function PhotoPost({ post }) {
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -988,7 +874,7 @@ function PostsNotFound() {
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1004,7 +890,7 @@ function PageNotFound() {
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1071,14 +957,14 @@ function SignIn() {
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = App;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Content__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Content__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Footer__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Header__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Header__ = __webpack_require__(6);
 
 
 
@@ -1089,7 +975,7 @@ function App() {
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1098,7 +984,7 @@ function App() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__handlers__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PhotoPosts__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Filter__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Filter__ = __webpack_require__(16);
 
 
 
@@ -1164,7 +1050,7 @@ function Content() {
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1217,14 +1103,14 @@ function Filter() {
 }
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Editor;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EditPost__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Header__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EditPost__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Header__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Footer__ = __webpack_require__(4);
 
 
@@ -1241,6 +1127,116 @@ function Editor(post) {
   `.trim());
   content.querySelector('.posts').appendChild(Object(__WEBPACK_IMPORTED_MODULE_1__EditPost__["a" /* default */])(post));
   return [Object(__WEBPACK_IMPORTED_MODULE_2__Header__["a" /* default */])(), content, Object(__WEBPACK_IMPORTED_MODULE_3__Footer__["a" /* default */])()];
+}
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = EditPost;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__handlers__ = __webpack_require__(1);
+
+
+
+function makeTag(tag) {
+  const element = Object(__WEBPACK_IMPORTED_MODULE_0__util__["d" /* stringToDOMElement */])(`
+    <span 
+      type="text" 
+      class="post__tag post__tag--editable input" 
+      contenteditable="true">
+      ${tag}
+    </span>&nbsp
+  `.trim());
+
+  element.onkeypress = (event) => {
+    if (event.code === 'Enter') {
+      event.preventDefault();
+      event.target.blur();
+    }
+  };
+
+  element.onblur = (event) => {
+    if (event.target.innerText.length === 0) {
+      event.target.parentNode.removeChild(event.target);
+    }
+  };
+  return element;
+}
+
+function EditPost(post = {
+  tags: [],
+  photoLink: '',
+  description: '',
+}) {
+  const element = Object(__WEBPACK_IMPORTED_MODULE_0__util__["d" /* stringToDOMElement */])(`
+    <div class="post">
+      <form class="post__edit-form">
+        <img class="post__photo" alt="Photo preview" src=${post.photoLink} />
+        <div>Photo link: <input id="photoLink" type="text" value="${post.photoLink}" class="input"/></div>
+        <div class="post__tags">
+          Tags:
+          <span id="tags"></span>
+          <a class="post__tag post__tag--add input">Add tag</a>
+        </div>
+        <div>
+          Description:
+          <div>
+            <textarea class="input post__description post__description--editable">${post.description}</textarea>
+          </div>
+        </div>
+        <button type="submit" class="input bright">Save</button>
+        <button id="cancel" class="input bright">Cancel</button>
+    </div>
+  `.trim());
+  const tagsWrapper = element.querySelector('#tags');
+  post.tags.forEach(tag => tagsWrapper.appendChild(makeTag(tag)));
+
+  element.querySelector('#photoLink').onblur = (event) => {
+    const url = event.target.value;
+    element.querySelector('.post__photo').src = url;
+  };
+
+  element.querySelector('.post__tag--add').onclick = () => {
+    const newTag = makeTag('');
+    tagsWrapper.appendChild(newTag);
+    newTag.focus();
+  };
+
+  element.querySelector('.post__edit-form').onsubmit = (event) => {
+    event.preventDefault();
+    const tags = Array.prototype.map.call(
+      element.querySelectorAll('.post__tag--editable'),
+      node => node.innerText,
+    );
+    const photoLink = element.querySelector('#photoLink').value;
+    const description = element.querySelector('.post__description').value;
+    Object(__WEBPACK_IMPORTED_MODULE_1__handlers__["a" /* default */])({
+      type: 'SAVE_POST',
+      post: Object.assign(post, {
+        tags,
+        photoLink,
+        description,
+      }),
+    });
+  };
+
+  element.querySelector('#cancel').onclick = (event) => {
+    event.preventDefault();
+    Object(__WEBPACK_IMPORTED_MODULE_1__handlers__["a" /* default */])({
+      type: 'CANCEL_EDITING',
+    });
+  };
+
+  element.querySelector('#photoLink').onkeypress = (event) => {
+    if (event.code === 'Enter') {
+      event.preventDefault();
+    }
+  };
+
+  return element;
 }
 
 
