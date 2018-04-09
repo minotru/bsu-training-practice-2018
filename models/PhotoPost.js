@@ -2,9 +2,9 @@ function isString(s) {
   return typeof s === 'string' || s instanceof String;
 }
 
-let idCnt = 0;
+let idCounter = 0;
 
-export default class PhotoPost {
+class PhotoPost {
 /**
   * @param {String} description
   * @param {Date} createdAt
@@ -49,11 +49,15 @@ export default class PhotoPost {
   }
 
   static nextId() {
-    return (idCnt++).toString();
+    return (idCounter++).toString();
   }
 
-  static resetIdCounter(idCounter) {
-    idCnt = idCounter;
+  static resetIdCounter(newIdCounter) {
+    idCounter = newIdCounter;
+  }
+
+  static getIdCounter() {
+    return idCounter;
   }
 
   /**
@@ -72,3 +76,5 @@ export default class PhotoPost {
     );
   }
 }
+
+module.exports = PhotoPost;

@@ -35,7 +35,7 @@ export default function EditPost(post = {
     <div class="post">
       <form class="post__edit-form">
         <img class="post__photo" alt="Photo preview" src=${post.photoLink} />
-        <div>Photo link: <input id="photoLink" type="text" value="${post.photoLink}" class="input"/></div>
+        <div>Photo link: <input id="photoLink" required type="text" value="${post.photoLink}" class="input"/></div>
         <div class="post__tags">
           Tags:
           <span id="tags"></span>
@@ -44,7 +44,12 @@ export default function EditPost(post = {
         <div>
           Description:
           <div>
-            <textarea class="input post__description post__description--editable">${post.description}</textarea>
+            <textarea 
+              required 
+              maxlength="200"
+              class="input post__description post__description--editable">
+              ${post.description}
+            </textarea>
           </div>
         </div>
         <button type="submit" class="input bright">Save</button>
