@@ -36,7 +36,7 @@ router.post('/posts', (req, res) => {
 });
 
 router.put('/posts/:id', (req, res) => {
-  const post = postsController.updatePost(req.params.id, req.url);
+  const post = postsController.updatePost(req.params.id, req.body);
   if (post) {
     res.json(post);
   } else {
