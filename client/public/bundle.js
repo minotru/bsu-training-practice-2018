@@ -249,7 +249,7 @@ function savePost(postObj) {
         setPage('app');
       });
   } else {
-    __WEBPACK_IMPORTED_MODULE_8__api__["e" /* updatePost */](postObj)
+    __WEBPACK_IMPORTED_MODULE_8__api__["f" /* updatePost */](postObj)
       .then((post) => {
         Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.editPhotoPost(post.id, post);
         setPage('app');
@@ -275,14 +275,12 @@ function login({
     Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user = null;
     onLoggedIn();
   } else {
-    const foundUser = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().users.find(user =>
-      (user.email === email && user.password === password));
-    if (foundUser) {
-      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user = foundUser;
-      onLoggedIn();
-    } else {
-      onError();
-    }
+    __WEBPACK_IMPORTED_MODULE_8__api__["e" /* login */](email, password)
+      .then((user) => {
+        Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user = user;
+        onLoggedIn();
+      })
+      .catch(onError);
   }
 }
 
@@ -682,8 +680,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__models__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__handlers__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__data__ = __webpack_require__(20);
-
 
 
 
@@ -693,7 +689,6 @@ const initialState = {
   filterConfig: null,
   postsInViewCnt: 0,
   user: null,
-  users: __WEBPACK_IMPORTED_MODULE_3__data__["a" /* users */],
   postsPerPage: 10,
 };
 Object(__WEBPACK_IMPORTED_MODULE_1__state__["b" /* setState */])(initialState);
@@ -1196,8 +1191,9 @@ function EditPost(post = {
 /* harmony export (immutable) */ __webpack_exports__["c"] = getPosts;
 /* harmony export (immutable) */ __webpack_exports__["d"] = likePost;
 /* harmony export (immutable) */ __webpack_exports__["a"] = createPost;
-/* harmony export (immutable) */ __webpack_exports__["e"] = updatePost;
+/* harmony export (immutable) */ __webpack_exports__["f"] = updatePost;
 /* harmony export (immutable) */ __webpack_exports__["b"] = deletePost;
+/* harmony export (immutable) */ __webpack_exports__["e"] = login;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__models_PhotoPost__ = __webpack_require__(4);
 
 
@@ -1209,7 +1205,7 @@ function buildRequest(url, params = {}) {
 }
 
 function parsePost(rawPost) {
-  const postObj =  Object.assign({}, rawPost, { createdAt: new Date(rawPost.createdAt) });
+  const postObj = Object.assign({}, rawPost, { createdAt: new Date(rawPost.createdAt) });
   return new __WEBPACK_IMPORTED_MODULE_0__models_PhotoPost__["a" /* default */](postObj);
 }
 
@@ -1259,56 +1255,20 @@ function deletePost(id) {
   });
 }
 
-
-/***/ }),
-/* 20 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return users; });
-/* unused harmony export examplePosts */
-const examplePosts = [
-  {
-    author: 'simon_karasik',
-    description: 'That was a wonderful sunset in the middle of summer.',
-    createdAt: new Date(2018, 2, 19),
-    photoLink: 'photo1.JPEG',
-    tags: ['beautiful', 'sunset', 'worthten'], 
-  },
-  {
-    author: 'Alex Mukharski',
-    description: 'post #2',
-    createdAt: new Date(2018, 0, 0),
-    photoLink: 'https://scontent-frx5-1.cdninstagram.com/vp/83a88bb2d1dd5aa7deee0029f2f08e53/5B3087E3/t51.2885-15/e35/28152259_336454203529783_1822968559202992128_n.jpg',
-    tags: ['tag1', 'tag2', 'tag3'],
-    likes: ['simon_karasik', 'Alex Kovalchuk'],
-  },
-  {
-    author: 'Alex Kovalchuk',
-    description: 'post #3',
-    createdAt: new Date(2017, 0, 5),
-    photoLink: 'https://scontent-frx5-1.cdninstagram.com/vp/a0915c1f5dc07ee4b473032fd81a4b11/5B3A2469/t51.2885-15/e35/26864741_2070912839806455_6365971865814433792_n.jpg',
-    tags: ['hello', "it's", 'me', 'tag2'],
-  },
-];
-
-const users = [
-  {
-    email: 'senich10@mail.ru',
-    name: 'simon_karasik',
-    password: '505137s',
-    avatarLink: 'avatar.jpg',
-    id: '1',
-  },
-  {
-    email: 'admin@example.org',
-    password: 'admin',
-    name: 'admin',
-    id: '0',
-  },
-];
-
-
+function login(email, password) {
+  return fetch('/auth', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+    return Promise.reject();
+  });
+}
 
 
 /***/ })

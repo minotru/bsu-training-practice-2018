@@ -8,7 +8,7 @@ function buildRequest(url, params = {}) {
 }
 
 function parsePost(rawPost) {
-  const postObj =  Object.assign({}, rawPost, { createdAt: new Date(rawPost.createdAt) });
+  const postObj = Object.assign({}, rawPost, { createdAt: new Date(rawPost.createdAt) });
   return new PhotoPost(postObj);
 }
 
@@ -55,5 +55,20 @@ export function updatePost(id, fields) {
 export function deletePost(id) {
   return fetch(`/posts/${id}`, {
     method: 'DELETE',
+  });
+}
+
+export function login(email, password) {
+  return fetch('/auth', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+    return Promise.reject();
   });
 }

@@ -1,0 +1,15 @@
+[
+    {
+        "email": "senich10@mail.ru",
+        "name": "simon_karasik",
+        "password": "505137s",
+        "avatarLink": "avatar.jpg",
+        "id": "'1"
+    },
+    {
+        "email": "admin@example.org",
+        "password": "admin",
+        "name": "admin",
+        "id": "0"
+    }
+]

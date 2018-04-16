@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const postsController = require('../controllers/postsController');
+const accountsController = require('../controllers/accountsController');
 
 router.get('/posts/:id', (req, res) => {
   const post = postsController.getPost(req.params.id);
@@ -49,6 +50,15 @@ router.delete('/posts/:id', (req, res) => {
     res.sendStatus(200);
   } else {
     res.sendStatus(404);
+  }
+});
+
+router.post('/auth', (req, res) => {
+  const user = accountsController.findUser(req.body.email, req.body.password);
+  if (user) {
+    res.json(user);
+  } else {
+    res.sendStatus(401);
   }
 });
 

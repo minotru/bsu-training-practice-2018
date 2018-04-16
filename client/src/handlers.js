@@ -120,14 +120,12 @@ function login({
     getState().user = null;
     onLoggedIn();
   } else {
-    const foundUser = getState().users.find(user =>
-      (user.email === email && user.password === password));
-    if (foundUser) {
-      getState().user = foundUser;
-      onLoggedIn();
-    } else {
-      onError();
-    }
+    api.login(email, password)
+      .then((user) => {
+        getState().user = user;
+        onLoggedIn();
+      })
+      .catch(onError);
   }
 }
 
