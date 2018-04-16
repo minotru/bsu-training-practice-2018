@@ -5,7 +5,8 @@ import PageNotFound from './components/PageNotFound';
 import SignIn from './components/SignIn';
 import App from './components/App';
 import Editor from './components/Editor';
-import { default as PhotoPostModel } from './models/PhotoPost';
+import { default as PhotoPostsModel } from './models/PhotoPosts';
+import * as api from './api';
 
 function setPage(pageName, args) {
   removeChildren(document.body);
@@ -26,48 +27,54 @@ function setPage(pageName, args) {
   render(page, document.body);
 }
 
-function showPosts() {
-  const { posts, filterConfig, postsInViewCnt } = getState();
-  PhotoPosts.render(posts.getPhotoPosts(0, postsInViewCnt, filterConfig));
+function loadMorePostsIfNeeded() {
+  const { postsPerPage, postsInViewCnt, filterConfig } = getState();
+  const availablePosts = getState().posts.getPhotoPosts(postsInViewCnt, postsPerPage, filterConfig);
+  if (availablePosts.length < getState().postsPerPage) {
+    let availablePostsCnt = availablePosts.length;
+    return api.getPosts(postsInViewCnt, postsPerPage, filterConfig)
+      .then((posts) => {
+        posts.forEach(post => getState().posts.addPhotoPost(post));
+        availablePostsCnt += posts.length;
+        return availablePostsCnt;
+      });
+  }
+  return Promise.resolve(postsPerPage);
 }
 
-function addPost(postObj) {
-  if (getState().posts.addPhotoPost(postObj)) {
-    showPosts();
-    return true;
-  }
-  setState({ posts: getState().posts });
-  return false;
+function showPosts() {
+  loadMorePostsIfNeeded()
+    .then((availablePostsCnt) => {
+      getState().postsInViewCnt += availablePostsCnt;
+      const { posts, postsInViewCnt, filterConfig } = getState();
+      PhotoPosts.render(posts.getPhotoPosts(0, postsInViewCnt, filterConfig));
+    });
 }
 
 function showMorePosts() {
-  getState().postsInViewCnt += 10;
   showPosts();
 }
 function removePost(id) {
-  if (getState().posts.removePhotoPost(id)) {
-    PhotoPosts.remove(id);
-    setState({ posts: getState().posts });
-    return true;
-  }
-  return false;
+  api.deletePost(id)
+    .then(() => {
+      PhotoPosts.remove(id);
+      getState().postsInViewCnt--;
+      getState().posts.removePhotoPost(id);
+    })
+    .catch(err => console.log(err));
 }
 
 function filterPosts(filterConfig) {
   getState().filterConfig = filterConfig;
-  getState().postsInViewCnt = 10;
+  getState().postsInViewCnt = 0;
   showPosts();
 }
 
 function likePost(id) {
-  const post = getState().posts.getPhotoPost(id);
-  if (post) {
-    post.like(getState().user.name);
-    PhotoPosts.update(id, post);
-    setState({ posts: getState().posts });
-    return true;
-  }
-  return false;
+  api.likePost(id, getState().user.name)
+    .then(() => {
+      getState().posts.getPhotoPost(id).like(getState().user.name);
+    });
 }
 
 function editPost(id) {
@@ -79,27 +86,27 @@ function createPost() {
 }
 
 function savePost(postObj) {
-  let post;
-  if (postObj.id) {
-    getState().posts.editPhotoPost(postObj.id, postObj);
-    post = getState().posts.getPhotoPost(postObj.id);
+  if (!postObj.id) {
+    const postObj1 = Object.create({}, postObj, { author: getState().user.name });
+    api.createPost(postObj1)
+      .then((post) => {
+        getState().posts.addPhotoPost(post);
+        setPage('app');
+      });
   } else {
-    post = new PhotoPostModel(Object.assign(
-      {
-        createdAt: new Date(),
-        author: getState().user.name,
-      },
-      postObj,
-    ));
-    getState().posts.addPhotoPost(post);
+    api.updatePost(postObj)
+      .then((post) => {
+        getState().posts.editPhotoPost(post.id, post);
+        setPage('app');
+      });
   }
-  setState({ posts: getState().posts });
-  setPage('app');
 }
 
 function logout() {
   getState().user = null;
-  setState({ user: getState().user });
+  getState().posts = PhotoPostsModel.fromArray([]);
+  getState().postsInViewCnt = 0;
+  setPage('signIn');
 }
 
 function login({
@@ -111,14 +118,12 @@ function login({
 }) {
   if (asGuest) {
     getState().user = null;
-    setState({ user: getState().user });
     onLoggedIn();
   } else {
     const foundUser = getState().users.find(user =>
       (user.email === email && user.password === password));
     if (foundUser) {
       getState().user = foundUser;
-      setState({ user: getState().user });
       onLoggedIn();
     } else {
       onError();
@@ -131,9 +136,6 @@ export default function handle(action) {
     case 'LIKE_POST':
       likePost(action.id);
       break;
-    case 'ADD_POST':
-      addPost(action.post);
-      break;
     case 'REMOVE_POST':
       removePost(action.id);
       break;
@@ -144,7 +146,7 @@ export default function handle(action) {
       filterPosts(action.filterConfig);
       break;
     case 'SHOW_POSTS': {
-      getState().postsInViewCnt = 10;
+      getState().postsInViewCnt = 0;
       getState().filterConfig = null;
       showPosts();
       break;

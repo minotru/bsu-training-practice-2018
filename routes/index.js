@@ -10,9 +10,9 @@ router.get('/posts/:id', (req, res) => {
   }
 });
 
-router.post('/posts', (req, res) => {
+router.get('/posts', (req, res) => {
   const { top = 10, skip = 0 } = req.query;
-  const filterConfig = req.body;
+  const filterConfig = req.query.filterConfig ? JSON.parse(req.query.filterConfig) : {};
   const posts = postsController.getPosts(skip, top, filterConfig);
   res.json(posts);
 });

@@ -1,38 +1,17 @@
 import { PhotoPosts as PhotoPostsModel } from './models';
 import { setState } from './state';
 import handle from './handlers';
-import { users as exampleUsers, examplePosts } from './data';
+import { users as exampleUsers } from './data';
 
 const initialState = {
-  posts: PhotoPostsModel.fromArray(examplePosts),
+  posts: PhotoPostsModel.fromArray([]),
   filterConfig: null,
-  postsInViewCnt: 3,
+  postsInViewCnt: 0,
   user: null,
   users: exampleUsers,
+  postsPerPage: 10,
 };
-
-if (window.localStorage.getItem('posts')) {
-  const rawPosts =
-    JSON.parse(window.localStorage.getItem('posts'))
-      .map(rawPost => Object.assign(
-        {},
-        rawPost,
-        { createdAt: new Date(rawPost.createdAt) },
-      ));
-  const posts = PhotoPostsModel.fromArray(rawPosts);
-  const users = JSON.parse(window.localStorage.getItem('users'));
-  const user = JSON.parse(window.localStorage.getItem('user'));
-  setState(Object.assign(
-    initialState,
-    {
-      posts,
-      users,
-      user,
-    },
-  ));
-} else {
-  setState(initialState);
-}
+setState(initialState);
 handle({
   type: 'SET_PAGE',
   pageName: 'app',

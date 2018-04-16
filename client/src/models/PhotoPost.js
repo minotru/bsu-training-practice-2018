@@ -2,8 +2,6 @@ function isString(s) {
   return typeof s === 'string' || s instanceof String;
 }
 
-let idCnt = 0;
-
 export default class PhotoPost {
 /**
   * @param {String} description
@@ -20,9 +18,9 @@ export default class PhotoPost {
     photoLink,
     tags = [],
     likes = [],
-    id = '',
+    id,
   }) {
-    this.id = id || PhotoPost.nextId();
+    this.id = id;
     this.description = description;
     this.createdAt = createdAt;
     this.author = author;
@@ -46,14 +44,6 @@ export default class PhotoPost {
     } else {
       this.likes.splice(ind, 1);
     }
-  }
-
-  static nextId() {
-    return (idCnt++).toString();
-  }
-
-  static resetIdCounter(idCounter) {
-    idCnt = idCounter;
   }
 
   /**

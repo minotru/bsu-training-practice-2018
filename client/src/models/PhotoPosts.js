@@ -1,5 +1,3 @@
-import PhotoPost from './PhotoPost';
-
 export default class PhotoPosts {
   constructor() {
     this.photoPosts = [];
@@ -52,25 +50,10 @@ export default class PhotoPosts {
   * @param {PhotoPost} post
   * @returns {Boolean} success / failure
   */
-  addPhotoPost(_post) {
-    let post = _post;
-    if (!(post instanceof PhotoPost)) {
-      post = new PhotoPost(_post);
-    }
-    if (!PhotoPost.validate(post)) {
-      return false;
-    }
+  addPhotoPost(post) {
     this.photoPosts.push(post);
     this.isSorted = false;
     return post;
-  }
-
-  getAllPosts() {
-    return this.photoPosts.slice();
-  }
-
-  getPhotoPostsCnt() {
-    return this.photoPosts.length;
   }
 
   /**
@@ -84,25 +67,12 @@ export default class PhotoPosts {
   /**
   * @returns {Boolean} success / failure
   */
-  editPhotoPost(id, { description, tags, photoLink }) {
+  editPhotoPost(id, fieldsToEdit) {
     const ind = this.photoPosts.findIndex(post => post.id === id);
     if (ind === -1) {
       return false;
     }
-    const editedPost = Object.assign(new PhotoPost({}), this.photoPosts[ind]);
-    if (typeof photoLink !== 'undefined') {
-      editedPost.photoLink = photoLink;
-    }
-    if (tags) {
-      editedPost.tags = tags;
-    }
-    if (typeof description !== 'undefined') {
-      editedPost.description = description;
-    }
-    if (!PhotoPost.validate(editedPost)) {
-      return false;
-    }
-    this.photoPosts[ind] = editedPost;
+    Object.assign(this.photoPosts[ind], fieldsToEdit);
     return true;
   }
 

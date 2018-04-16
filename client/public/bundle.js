@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -146,12 +146,14 @@ function removeChildren(element) {
 /* harmony export (immutable) */ __webpack_exports__["a"] = handle;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_PageNotFound__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_SignIn__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_App__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_Editor__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__models_PhotoPost__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__models_PhotoPosts__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api__ = __webpack_require__(19);
+
 
 
 
@@ -180,48 +182,54 @@ function setPage(pageName, args) {
   Object(__WEBPACK_IMPORTED_MODULE_1__util__["c" /* render */])(page, document.body);
 }
 
-function showPosts() {
-  const { posts, filterConfig, postsInViewCnt } = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])();
-  __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].render(posts.getPhotoPosts(0, postsInViewCnt, filterConfig));
+function loadMorePostsIfNeeded() {
+  const { postsPerPage, postsInViewCnt, filterConfig } = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])();
+  const availablePosts = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.getPhotoPosts(postsInViewCnt, postsPerPage, filterConfig);
+  if (availablePosts.length < Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsPerPage) {
+    let availablePostsCnt = availablePosts.length;
+    return __WEBPACK_IMPORTED_MODULE_8__api__["c" /* getPosts */](postsInViewCnt, postsPerPage, filterConfig)
+      .then((posts) => {
+        posts.forEach(post => Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.addPhotoPost(post));
+        availablePostsCnt += posts.length;
+        return availablePostsCnt;
+      });
+  }
+  return Promise.resolve(postsPerPage);
 }
 
-function addPost(postObj) {
-  if (Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.addPhotoPost(postObj)) {
-    showPosts();
-    return true;
-  }
-  Object(__WEBPACK_IMPORTED_MODULE_0__state__["b" /* setState */])({ posts: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts });
-  return false;
+function showPosts() {
+  loadMorePostsIfNeeded()
+    .then((availablePostsCnt) => {
+      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt += availablePostsCnt;
+      const { posts, postsInViewCnt, filterConfig } = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])();
+      __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].render(posts.getPhotoPosts(0, postsInViewCnt, filterConfig));
+    });
 }
 
 function showMorePosts() {
-  Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt += 10;
   showPosts();
 }
 function removePost(id) {
-  if (Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.removePhotoPost(id)) {
-    __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].remove(id);
-    Object(__WEBPACK_IMPORTED_MODULE_0__state__["b" /* setState */])({ posts: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts });
-    return true;
-  }
-  return false;
+  __WEBPACK_IMPORTED_MODULE_8__api__["b" /* deletePost */](id)
+    .then(() => {
+      __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].remove(id);
+      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt--;
+      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.removePhotoPost(id);
+    })
+    .catch(err => console.log(err));
 }
 
 function filterPosts(filterConfig) {
   Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().filterConfig = filterConfig;
-  Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = 10;
+  Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = 0;
   showPosts();
 }
 
 function likePost(id) {
-  const post = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.getPhotoPost(id);
-  if (post) {
-    post.like(Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name);
-    __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].update(id, post);
-    Object(__WEBPACK_IMPORTED_MODULE_0__state__["b" /* setState */])({ posts: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts });
-    return true;
-  }
-  return false;
+  __WEBPACK_IMPORTED_MODULE_8__api__["d" /* likePost */](id, Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name)
+    .then(() => {
+      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.getPhotoPost(id).like(Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name);
+    });
 }
 
 function editPost(id) {
@@ -233,27 +241,27 @@ function createPost() {
 }
 
 function savePost(postObj) {
-  let post;
-  if (postObj.id) {
-    Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.editPhotoPost(postObj.id, postObj);
-    post = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.getPhotoPost(postObj.id);
+  if (!postObj.id) {
+    const postObj1 = Object.create({}, postObj, { author: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name });
+    __WEBPACK_IMPORTED_MODULE_8__api__["a" /* createPost */](postObj1)
+      .then((post) => {
+        Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.addPhotoPost(post);
+        setPage('app');
+      });
   } else {
-    post = new __WEBPACK_IMPORTED_MODULE_7__models_PhotoPost__["a" /* default */](Object.assign(
-      {
-        createdAt: new Date(),
-        author: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name,
-      },
-      postObj,
-    ));
-    Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.addPhotoPost(post);
+    __WEBPACK_IMPORTED_MODULE_8__api__["e" /* updatePost */](postObj)
+      .then((post) => {
+        Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.editPhotoPost(post.id, post);
+        setPage('app');
+      });
   }
-  Object(__WEBPACK_IMPORTED_MODULE_0__state__["b" /* setState */])({ posts: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts });
-  setPage('app');
 }
 
 function logout() {
   Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user = null;
-  Object(__WEBPACK_IMPORTED_MODULE_0__state__["b" /* setState */])({ user: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user });
+  Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts = __WEBPACK_IMPORTED_MODULE_7__models_PhotoPosts__["a" /* default */].fromArray([]);
+  Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = 0;
+  setPage('signIn');
 }
 
 function login({
@@ -265,14 +273,12 @@ function login({
 }) {
   if (asGuest) {
     Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user = null;
-    Object(__WEBPACK_IMPORTED_MODULE_0__state__["b" /* setState */])({ user: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user });
     onLoggedIn();
   } else {
     const foundUser = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().users.find(user =>
       (user.email === email && user.password === password));
     if (foundUser) {
       Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user = foundUser;
-      Object(__WEBPACK_IMPORTED_MODULE_0__state__["b" /* setState */])({ user: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user });
       onLoggedIn();
     } else {
       onError();
@@ -285,9 +291,6 @@ function handle(action) {
     case 'LIKE_POST':
       likePost(action.id);
       break;
-    case 'ADD_POST':
-      addPost(action.post);
-      break;
     case 'REMOVE_POST':
       removePost(action.id);
       break;
@@ -298,7 +301,7 @@ function handle(action) {
       filterPosts(action.filterConfig);
       break;
     case 'SHOW_POSTS': {
-      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = 10;
+      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = 0;
       Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().filterConfig = null;
       showPosts();
       break;
@@ -347,93 +350,11 @@ function getState() {
 
 function setState(stateUpdate) {
   state = Object.assign(state, stateUpdate);
-  if (stateUpdate.users) {
-    window.localStorage.setItem('users', JSON.stringify(stateUpdate.users));
-  }
-  if (stateUpdate.hasOwnProperty('user')) {
-    window.localStorage.setItem('user', JSON.stringify(stateUpdate.user));
-  }
-  if (stateUpdate.posts) {
-    window.localStorage.setItem('posts',
-      JSON.stringify(stateUpdate.posts.photoPosts)
-    );
-  }
 }
 
 
 /***/ }),
 /* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-function isString(s) {
-  return typeof s === 'string' || s instanceof String;
-}
-
-let idCnt = 0;
-
-class PhotoPost {
-/**
-  * @param {String} description
-  * @param {Date} createdAt
-  * @param {String} author
-  * @param {String} photoLink
-  * @param {[String]} tags
-  * @param {[String]} likes
-  */
-  constructor({ description, createdAt, author, photoLink, tags = [], likes = [], id = ''}) {
-    this.id = id || PhotoPost.nextId();
-    this.description = description;
-    this.createdAt = createdAt;
-    this.author = author;
-    this.photoLink = photoLink;
-    this.tags = tags;
-    this.likes = likes;
-  }
-
-  getLikesCnt() {
-    return this.likes.length;
-  }
-
-  /**
-  * Like this post. Calling twice with same userName will unlike
-  * @param {String} userName User who liked this post.
-  */
-  like(userName) {
-    const ind = this.likes.indexOf(userName);
-    if (ind === -1) {
-      this.likes.push(userName);
-    } else {
-      this.likes.splice(ind, 1);
-    }
-  }
-
-  static nextId() {
-    return (idCnt++).toString();
-  }
-
-  /**
-  * @param {PhotoPost} post
-  */
-  static validate(post) {
-    return (
-      post instanceof PhotoPost &&
-      isString(post.id) && post.id.length > 0 &&
-      isString(post.description) && post.description.length < 200 &&
-      (post.createdAt instanceof Date) &&
-      isString(post.author) && post.author.length > 0 &&
-      isString(post.photoLink) && post.photoLink.length > 0 &&
-      post.tags instanceof Array &&
-      post.likes instanceof Array
-    );
-  }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = PhotoPost;
-
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -461,7 +382,180 @@ function Footer() {
 
 
 /***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function isString(s) {
+  return typeof s === 'string' || s instanceof String;
+}
+
+class PhotoPost {
+/**
+  * @param {String} description
+  * @param {Date} createdAt
+  * @param {String} author
+  * @param {String} photoLink
+  * @param {[String]} tags
+  * @param {[String]} likes
+  */
+  constructor({
+    description,
+    createdAt,
+    author,
+    photoLink,
+    tags = [],
+    likes = [],
+    id,
+  }) {
+    this.id = id;
+    this.description = description;
+    this.createdAt = createdAt;
+    this.author = author;
+    this.photoLink = photoLink;
+    this.tags = tags;
+    this.likes = likes;
+  }
+
+  getLikesCnt() {
+    return this.likes.length;
+  }
+
+  /**
+  * Like this post. Calling twice with same userName will unlike
+  * @param {String} userName User who liked this post.
+  */
+  like(userName) {
+    const ind = this.likes.indexOf(userName);
+    if (ind === -1) {
+      this.likes.push(userName);
+    } else {
+      this.likes.splice(ind, 1);
+    }
+  }
+
+  /**
+  * @param {PhotoPost} post
+  */
+  static validate(post) {
+    return (
+      post instanceof PhotoPost &&
+      isString(post.id) && post.id.length > 0 &&
+      isString(post.description) && post.description.length < 200 &&
+      (post.createdAt instanceof Date) &&
+      isString(post.author) && post.author.length > 0 &&
+      isString(post.photoLink) && post.photoLink.length > 0 &&
+      post.tags instanceof Array &&
+      post.likes instanceof Array
+    );
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = PhotoPost;
+
+
+
+/***/ }),
 /* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class PhotoPosts {
+  constructor() {
+    this.photoPosts = [];
+    this.isSorted = true;
+  }
+
+  static fromArray(arr) {
+    const posts = new PhotoPosts();
+    arr.forEach(post => posts.addPhotoPost(post));
+    return posts;
+  }
+
+  /**
+  * @param {number} skip
+  * @param {number} top
+  * @param {{author? : String, fromDate? : Date, toDate? : Date, tags? : [String]}} filterConfig
+  * @returns {[PhotoPost]}
+  */
+  getPhotoPosts(skip = 0, top = 10, filterConfig) {
+    if (!this.isSorted) {
+      this.photoPosts.sort((p1, p2) => p1.createdAt < p2.createdAt);
+      this.isSorted = true;
+    }
+    const result = [];
+    for (let i = skip; i < Math.min(this.photoPosts.length, skip + top); i++) {
+      let isGood = true;
+      const post = this.photoPosts[i];
+      if (filterConfig) {
+        if (filterConfig.author && post.author !== filterConfig.author) {
+          isGood = false;
+        }
+        if (filterConfig.fromDate && post.createdAt < filterConfig.fromDate) {
+          isGood = false;
+        }
+        if (filterConfig.toDate && post.createdAt > filterConfig.toDate) {
+          isGood = false;
+        }
+        if (filterConfig.tags && !filterConfig.tags.every(tag => post.tags.indexOf(tag) !== -1)) {
+          isGood = false;
+        }
+      }
+      if (isGood) {
+        result.push(post);
+      }
+    }
+    return result;
+  }
+
+  /**
+  * @param {PhotoPost} post
+  * @returns {Boolean} success / failure
+  */
+  addPhotoPost(post) {
+    this.photoPosts.push(post);
+    this.isSorted = false;
+    return post;
+  }
+
+  /**
+  * @param {String} id
+  * @returns {PhotoPost | null} Returns post with such id or null if not found.
+  */
+  getPhotoPost(id) {
+    return this.photoPosts.find(post => post.id === id) || null;
+  }
+
+  /**
+  * @returns {Boolean} success / failure
+  */
+  editPhotoPost(id, fieldsToEdit) {
+    const ind = this.photoPosts.findIndex(post => post.id === id);
+    if (ind === -1) {
+      return false;
+    }
+    Object.assign(this.photoPosts[ind], fieldsToEdit);
+    return true;
+  }
+
+  /**
+  * @param {String} id
+  * @returns {Boolean} success / failure
+  */
+  removePhotoPost(id) {
+    const ind = this.photoPosts.findIndex(post => post.id === id);
+    if (ind === -1) {
+      return false;
+    }
+    this.photoPosts.splice(ind, 1);
+    return true;
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = PhotoPosts;
+
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -531,7 +625,7 @@ PhotoPosts.render = function (posts) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -580,50 +674,29 @@ function Header() {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__models__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__models__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__handlers__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__data__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__data__ = __webpack_require__(20);
 
 
 
 
 
 const initialState = {
-  posts: __WEBPACK_IMPORTED_MODULE_0__models__["a" /* PhotoPosts */].fromArray(__WEBPACK_IMPORTED_MODULE_3__data__["a" /* examplePosts */]),
+  posts: __WEBPACK_IMPORTED_MODULE_0__models__["a" /* PhotoPosts */].fromArray([]),
   filterConfig: null,
-  postsInViewCnt: 3,
+  postsInViewCnt: 0,
   user: null,
-  users: __WEBPACK_IMPORTED_MODULE_3__data__["b" /* users */],
+  users: __WEBPACK_IMPORTED_MODULE_3__data__["a" /* users */],
+  postsPerPage: 10,
 };
-
-if (window.localStorage.getItem('posts')) {
-  const rawPosts =
-    JSON.parse(window.localStorage.getItem('posts'))
-      .map(rawPost => Object.assign(
-        {},
-        rawPost,
-        { createdAt: new Date(rawPost.createdAt) },
-      ));
-  const posts = __WEBPACK_IMPORTED_MODULE_0__models__["a" /* PhotoPosts */].fromArray(rawPosts);
-  const users = JSON.parse(window.localStorage.getItem('users'));
-  const user = JSON.parse(window.localStorage.getItem('user'));
-  Object(__WEBPACK_IMPORTED_MODULE_1__state__["b" /* setState */])(Object.assign(
-    initialState,
-    {
-      posts,
-      users,
-      user,
-    },
-  ));
-} else {
-  Object(__WEBPACK_IMPORTED_MODULE_1__state__["b" /* setState */])(initialState);
-}
+Object(__WEBPACK_IMPORTED_MODULE_1__state__["b" /* setState */])(initialState);
 Object(__WEBPACK_IMPORTED_MODULE_2__handlers__["a" /* default */])({
   type: 'SET_PAGE',
   pageName: 'app',
@@ -631,146 +704,15 @@ Object(__WEBPACK_IMPORTED_MODULE_2__handlers__["a" /* default */])({
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PhotoPost__ = __webpack_require__(3);
-/* unused harmony reexport PhotoPost */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhotoPosts__ = __webpack_require__(9);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_1__PhotoPosts__["a"]; });
-
-
-
-
-/***/ }),
 /* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PhotoPost__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PhotoPost__ = __webpack_require__(4);
+/* unused harmony reexport PhotoPost */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhotoPosts__ = __webpack_require__(5);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_1__PhotoPosts__["a"]; });
 
-
-class PhotoPosts {
-  constructor() {
-    this.photoPosts = [];
-    this.isSorted = true;
-  }
-
-  static fromArray(arr) {
-    const posts = new PhotoPosts();
-    arr.forEach(post => posts.addPhotoPost(post));
-    return posts;
-  }
-
-  /**
-  * @param {number} skip
-  * @param {number} top
-  * @param {{author? : String, fromDate? : Date, toDate? : Date, tags? : [String]}} filterConfig
-  * @returns {[PhotoPost]}
-  */
-  getPhotoPosts(skip = 0, top = 10, filterConfig) {
-    if (!this.isSorted) {
-      this.photoPosts.sort((p1, p2) => p1.createdAt < p2.createdAt);
-      this.isSorted = true;
-    }
-    const result = [];
-    for (let i = skip; i < Math.min(this.photoPosts.length, skip + top); i++) {
-      let isGood = true;
-      const post = this.photoPosts[i];
-      if (filterConfig) {
-        if (filterConfig.author && post.author !== filterConfig.author) {
-          isGood = false;
-        }
-        if (filterConfig.fromDate && post.createdAt < filterConfig.fromDate) {
-          isGood = false;
-        }
-        if (filterConfig.toDate && post.createdAt > filterConfig.toDate) {
-          isGood = false;
-        }
-        if (filterConfig.tags && !filterConfig.tags.every(tag => post.tags.indexOf(tag) !== -1)) {
-          isGood = false;
-        }
-      }
-      if (isGood) {
-        result.push(post);
-      }
-    }
-    return result;
-  }
-
-  /**
-  * @param {PhotoPost} post
-  * @returns {Boolean} success / failure
-  */
-  addPhotoPost(_post) {
-    let post = _post;
-    if (!(post instanceof __WEBPACK_IMPORTED_MODULE_0__PhotoPost__["a" /* default */])) {
-      post = new __WEBPACK_IMPORTED_MODULE_0__PhotoPost__["a" /* default */](_post);
-    }
-    if (!__WEBPACK_IMPORTED_MODULE_0__PhotoPost__["a" /* default */].validate(post)) {
-      return false;
-    }
-    this.photoPosts.push(post);
-    this.isSorted = false;
-    return post;
-  }
-
-  getAllPosts() {
-    return this.photoPosts.slice();
-  }
-
-  getPhotoPostsCnt() {
-    return this.photoPosts.length;
-  }
-
-  /**
-  * @param {String} id
-  * @returns {PhotoPost | null} Returns post with such id or null if not found.
-  */
-  getPhotoPost(id) {
-    return this.photoPosts.find(post => post.id === id) || null;
-  }
-
-  /**
-  * @returns {Boolean} success / failure
-  */
-  editPhotoPost(id, { description, tags, photoLink }) {
-    const ind = this.photoPosts.findIndex(post => post.id === id);
-    if (ind === -1) {
-      return false;
-    }
-    const editedPost = Object.assign(new __WEBPACK_IMPORTED_MODULE_0__PhotoPost__["a" /* default */]({}), this.photoPosts[ind]);
-    if (typeof photoLink !== 'undefined') {
-      editedPost.photoLink = photoLink;
-    }
-    if (tags) {
-      editedPost.tags = tags;
-    }
-    if (typeof description !== 'undefined') {
-      editedPost.description = description;
-    }
-    if (!__WEBPACK_IMPORTED_MODULE_0__PhotoPost__["a" /* default */].validate(editedPost)) {
-      return false;
-    }
-    this.photoPosts[ind] = editedPost;
-    return true;
-  }
-
-  /**
-  * @param {String} id
-  * @returns {Boolean} success / failure
-  */
-  removePhotoPost(id) {
-    const ind = this.photoPosts.findIndex(post => post.id === id);
-    if (ind === -1) {
-      return false;
-    }
-    this.photoPosts.splice(ind, 1);
-    return true;
-  }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = PhotoPosts;
 
 
 
@@ -896,7 +838,7 @@ function PageNotFound() {
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = SignIn;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Footer__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Footer__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__handlers__ = __webpack_require__(1);
 
 
@@ -963,8 +905,8 @@ function SignIn() {
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = App;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Content__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Footer__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Header__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Footer__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Header__ = __webpack_require__(7);
 
 
 
@@ -983,7 +925,7 @@ function App() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__state__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__handlers__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PhotoPosts__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PhotoPosts__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Filter__ = __webpack_require__(16);
 
 
@@ -1110,8 +1052,8 @@ function Filter() {
 /* harmony export (immutable) */ __webpack_exports__["a"] = Editor;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EditPost__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Header__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Footer__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Header__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Footer__ = __webpack_require__(3);
 
 
 
@@ -1175,7 +1117,7 @@ function EditPost(post = {
     <div class="post">
       <form class="post__edit-form">
         <img class="post__photo" alt="Photo preview" src=${post.photoLink} />
-        <div>Photo link: <input id="photoLink" type="text" value="${post.photoLink}" class="input"/></div>
+        <div>Photo link: <input id="photoLink" required type="text" value="${post.photoLink}" class="input"/></div>
         <div class="post__tags">
           Tags:
           <span id="tags"></span>
@@ -1184,7 +1126,12 @@ function EditPost(post = {
         <div>
           Description:
           <div>
-            <textarea class="input post__description post__description--editable">${post.description}</textarea>
+            <textarea 
+              required 
+              maxlength="200"
+              class="input post__description post__description--editable">
+              ${post.description}
+            </textarea>
           </div>
         </div>
         <button type="submit" class="input bright">Save</button>
@@ -1245,8 +1192,81 @@ function EditPost(post = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return users; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return examplePosts; });
+/* unused harmony export getPost */
+/* harmony export (immutable) */ __webpack_exports__["c"] = getPosts;
+/* harmony export (immutable) */ __webpack_exports__["d"] = likePost;
+/* harmony export (immutable) */ __webpack_exports__["a"] = createPost;
+/* harmony export (immutable) */ __webpack_exports__["e"] = updatePost;
+/* harmony export (immutable) */ __webpack_exports__["b"] = deletePost;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__models_PhotoPost__ = __webpack_require__(4);
+
+
+function buildRequest(url, params = {}) {
+  const stringParams = Object.keys(params)
+    .filter(key => typeof params[key] !== 'undefined')
+    .reduce((res, key) => res + '&' + key + '=' + JSON.stringify(params[key]), '');
+  return url + '?' + stringParams.slice(1);
+}
+
+function parsePost(rawPost) {
+  const postObj =  Object.assign({}, rawPost, { createdAt: new Date(rawPost.createdAt) });
+  return new __WEBPACK_IMPORTED_MODULE_0__models_PhotoPost__["a" /* default */](postObj);
+}
+
+function getPost(id) {
+  return fetch(buildRequest(`/posts/${id}`))
+    .then(response => response.json())
+    .then(rawPost => parsePost(rawPost));
+}
+
+function getPosts(skip = 0, top = 10, filterConfig = {}) {
+  return fetch(buildRequest('/posts', { top, skip, filterConfig }))
+    .then(response => response.json())
+    .then(rawPosts => rawPosts.map(rawPost => parsePost(rawPost)));
+}
+
+function likePost(id, user) {
+  return fetch(buildRequest(`/posts/${id}/like`, { user }), {
+    method: 'PUT',
+  });
+}
+
+function createPost(post) {
+  return fetch('/posts', {
+    method: 'POST',
+    body: JSON.stringify(post),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+    .then(response => parsePost(response.json()));
+}
+
+function updatePost(id, fields) {
+  return fetch(`/posts/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(fields),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+    .then(response => parsePost(response.json()));
+}
+
+function deletePost(id) {
+  return fetch(`/posts/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return users; });
+/* unused harmony export examplePosts */
 const examplePosts = [
   {
     author: 'simon_karasik',

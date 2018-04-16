@@ -2,9 +2,9 @@ const fs = require('fs');
 const PhotoPost = require('../models/PhotoPost');
 const PhotoPosts = require('../models/PhotoPosts');
 
-const filePath = `./data/posts.json`;
+const filePath = './data/posts.json';
 const content = JSON.parse(fs.readFileSync(filePath));
-const postsRaw = content.posts.map(post => {
+const postsRaw = content.posts.map((post) => {
   post.createdAt = new Date(post.createdAt);
   return post;
 });
