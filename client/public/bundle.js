@@ -1235,7 +1235,9 @@ function EditPost(post = {
 function buildRequest(url, params = {}) {
   const stringParams = Object.keys(params)
     .filter(key => typeof params[key] !== 'undefined')
-    .reduce((res, key) => `${res}&${key}=${JSON.stringify(params[key])}`, '');
+    .reduce((res, key) => `${res}&${key}=${
+      params[key] instanceof Object ? JSON.stringify(params[key]) : params[key]}`, 
+    '');
   return `${url}?${stringParams.slice(1)}`;
 }
 
@@ -1250,21 +1252,11 @@ function objectToFormData(obj) {
   const data = new FormData();
   Object.getOwnPropertyNames(obj)
     .forEach(key => data.append(key, obj[key]));
-  data.append('tags', JSON.stringify(obj.tags));
   return data;
 }
 
 function parsePost(rawPost) {
   const postObj = Object.assign({}, rawPost, { createdAt: new Date(rawPost.createdAt) });
-  postObj.likes = postObj.likes.map((person) => {
-    let str = person;
-    try {
-      str = JSON.parse(person);
-    } catch (e) {
-
-    }
-    return str;
-  });
   return new __WEBPACK_IMPORTED_MODULE_0__models_PhotoPost__["a" /* default */](postObj);
 }
 
