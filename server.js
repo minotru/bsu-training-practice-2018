@@ -9,7 +9,7 @@ const staticPath = `${__dirname}/client/public`;
 const app = express();
 app.use(express.static(staticPath));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(logger);
 app.use(router);
 app.use((req, res) => {

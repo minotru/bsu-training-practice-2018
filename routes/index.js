@@ -1,6 +1,39 @@
+const fs = require('fs');
+const path = require('path');
 const router = require('express').Router();
+const multer = require('multer');
 const postsController = require('../controllers/postsController');
 const accountsController = require('../controllers/accountsController');
+
+const photosDir = path.resolve(__dirname, '../data/photos');
+const storage = multer.diskStorage({
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+  destination: (req, file, cb) => {
+    cb(null, photosDir);
+  },
+});
+const upload = multer({
+  storage,
+});
+
+function parseFormData(req, res, next) {
+  if (req.file) {
+    req.body.photoLink = `photos/${req.file.filename}`;
+  }
+  req.body.tags = JSON.parse(req.body.tags);
+  next();
+}
+
+function deletePhotoFile(photoLink) {
+  const photoPath = path.join(photosDir, path.basename(photoLink));
+  fs.unlink(photoPath, () => {});
+}
+
+router.get('/photos/:id', (req, res) => {
+  res.sendFile(path.join(photosDir, req.params.id));
+});
 
 router.get('/posts/:id', (req, res) => {
   const post = postsController.getPost(req.params.id);
@@ -27,7 +60,7 @@ router.put('/posts/:id/like', (req, res) => {
   }
 });
 
-router.post('/posts', (req, res) => {
+router.post('/posts', upload.single('photoFile'), parseFormData, (req, res) => {
   const post = postsController.createPost(req.body);
   if (post) {
     res.json(post);
@@ -36,13 +69,17 @@ router.post('/posts', (req, res) => {
   }
 });
 
-router.put('/posts/:id', (req, res) => {
+router.put('/posts/:id', upload.single('photoFile'), parseFormData, (req, res) => {
+  const oldPost = postsController.getPost(req.params.id);
+  if (!oldPost) {
+    return res.sendStatus(404);
+  }
+  deletePhotoFile(oldPost.photoLink); // delete old file
   const post = postsController.updatePost(req.params.id, req.body);
   if (post) {
-    res.json(post);
-  } else {
-    res.sendStatus(400);
+    return res.json(post);
   }
+  return res.sendStatus(400);
 });
 
 router.delete('/posts/:id', (req, res) => {
