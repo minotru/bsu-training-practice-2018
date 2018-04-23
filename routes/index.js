@@ -22,7 +22,7 @@ function parseFormData(req, res, next) {
   if (req.file) {
     req.body.photoLink = `photos/${req.file.filename}`;
   }
-  req.body.tags = JSON.parse(req.body.tags);
+  req.body.likes = req.body.likes.split(',');
   next();
 }
 
@@ -83,6 +83,11 @@ router.put('/posts/:id', upload.single('photoFile'), parseFormData, (req, res) =
 });
 
 router.delete('/posts/:id', (req, res) => {
+  const post = postsController.getPost(req.params.id);
+  if (!post) {
+    return res.sendStatus(404);
+  }
+  deletePhotoFile(post.photoLink);
   if (postsController.removePost(req.params.id)) {
     res.sendStatus(200);
   } else {
