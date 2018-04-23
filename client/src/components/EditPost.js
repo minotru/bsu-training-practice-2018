@@ -35,7 +35,8 @@ export default function EditPost(post = {
     <div class="post">
       <form class="post__edit-form">
         <img class="post__photo" alt="Photo preview" src=${post.photoLink} />
-        <div>Photo link: <input id="photoLink" required type="text" value="${post.photoLink}" class="input"/></div>
+        <div>Photo link: <input id="photoLink" type="text" value="${post.photoLink}" class="input"/></div>
+        <div><label class="input" for="photoFile">Load photo</label><input type="file" accept="image/*" id="photoFile"></div>
         <div class="post__tags">
           Tags:
           <span id="tags"></span>
@@ -47,8 +48,7 @@ export default function EditPost(post = {
             <textarea 
               required 
               maxlength="200"
-              class="input post__description post__description--editable">
-              ${post.description}
+              class="input post__description post__description--editable">${post.description}
             </textarea>
           </div>
         </div>
@@ -59,9 +59,34 @@ export default function EditPost(post = {
   const tagsWrapper = element.querySelector('#tags');
   post.tags.forEach(tag => tagsWrapper.appendChild(makeTag(tag)));
 
+  let state = {
+    usePhotoLink: true,
+    photoLink: post.photoLink,
+  };
+
   element.querySelector('#photoLink').onblur = (event) => {
     const url = event.target.value;
-    element.querySelector('.post__photo').src = url;
+    if (url !== state.photoLink && url !== '') {
+      element.querySelector('.post__photo').src = url;
+      state = {
+        usePhotoLink: true,
+        photoLink: url,
+      };
+    }
+  };
+
+  element.querySelector('#photoFile').onchange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      state = {
+        usePhotoLink: false,
+        photoFile: file,
+      };
+      element.querySelector('.post__photo').src = reader.result;
+      element.querySelector('#photoLink').value = '';
+    };
+    reader.readAsDataURL(file);
   };
 
   element.querySelector('.post__tag--add').onclick = () => {
@@ -72,19 +97,29 @@ export default function EditPost(post = {
 
   element.querySelector('.post__edit-form').onsubmit = (event) => {
     event.preventDefault();
+    if (!state.photoLink && !state.photoFile) {
+      alert('Please, provide either photo link, either photo file');
+      return;
+    }
     const tags = Array.prototype.map.call(
       element.querySelectorAll('.post__tag--editable'),
       node => node.innerText,
     );
-    const photoLink = element.querySelector('#photoLink').value;
     const description = element.querySelector('.post__description').value;
+    const postToSend = Object.assign({}, post, {
+      tags,
+      description,
+    });
+    if (state.usePhotoLink) {
+      postToSend.photoLink = state.photoLink;
+    } else {
+      delete postToSend.photoLink;
+      postToSend.photoFile = state.photoFile;
+    }
     handle({
       type: 'SAVE_POST',
-      post: Object.assign(post, {
-        tags,
-        photoLink,
-        description,
-      }),
+      photo: state,
+      post: postToSend,
     });
   };
 

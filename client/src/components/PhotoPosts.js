@@ -27,16 +27,6 @@ PhotoPosts.update = function (id, post) {
   }
 };
 
-// PhotoPosts.create = function () {
-//   element.removeChild(element.firstChild);
-//   element.appendChild(EditPost());
-// };
-
-// PhotoPosts.edit = function (post) {
-//   element.removeChild(element.firstChild);
-//   element.appendChild(EditPost(post));
-// };
-
 PhotoPosts.remove = function (id) {
   const node = findNode(id);
   if (node) {

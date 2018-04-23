@@ -1,4 +1,4 @@
-import { getState, setState } from './state';
+import { getState } from './state';
 import { removeChildren, render } from './util';
 import PhotoPosts from './components/PhotoPosts';
 import PageNotFound from './components/PageNotFound';
@@ -8,8 +8,14 @@ import Editor from './components/Editor';
 import { default as PhotoPostsModel } from './models/PhotoPosts';
 import * as api from './api';
 
+function clearPostsViewConfig() {
+  getState().postsInViewCnt = 0;
+  getState().filterConfig = null;
+}
+
 function setPage(pageName, args) {
   removeChildren(document.body);
+  clearPostsViewConfig();
   let page = null;
   switch (pageName) {
     case 'signIn':
@@ -27,53 +33,58 @@ function setPage(pageName, args) {
   render(page, document.body);
 }
 
-function loadMorePostsIfNeeded() {
-  const { postsPerPage, postsInViewCnt, filterConfig } = getState();
-  const availablePosts = getState().posts.getPhotoPosts(postsInViewCnt, postsPerPage, filterConfig);
-  if (availablePosts.length < getState().postsPerPage) {
-    let availablePostsCnt = availablePosts.length;
-    return api.getPosts(postsInViewCnt, postsPerPage, filterConfig)
-      .then((posts) => {
-        posts.forEach(post => getState().posts.addPhotoPost(post));
-        availablePostsCnt += posts.length;
-        return availablePostsCnt;
-      });
-  }
-  return Promise.resolve(postsPerPage);
+function showPosts() {
+  const { posts, postsInViewCnt, filterConfig } = getState();
+  const postsToShow = posts.getPhotoPosts(0, postsInViewCnt, filterConfig);
+  PhotoPosts.render(postsToShow);
 }
 
-function showPosts() {
-  loadMorePostsIfNeeded()
+function loadMorePostsIfNeeded(wantedPostsCnt) {
+  const { filterConfig } = getState();
+  const availablePosts = getState().posts.getPhotoPosts(0, wantedPostsCnt, filterConfig);
+  const availablePostsCnt = availablePosts.length;
+  if (availablePostsCnt < wantedPostsCnt) {
+    return api.getPosts(availablePostsCnt, wantedPostsCnt - availablePostsCnt, filterConfig)
+      .then((posts) => {
+        posts.forEach(post => getState().posts.addPhotoPost(post));
+        return availablePostsCnt + posts.length;
+      });
+  }
+  return Promise.resolve(wantedPostsCnt);
+}
+
+function loadMorePostsIfNeededAndShow(wantedPostsCnt) {
+  loadMorePostsIfNeeded(wantedPostsCnt)
     .then((availablePostsCnt) => {
-      getState().postsInViewCnt += availablePostsCnt;
-      const { posts, postsInViewCnt, filterConfig } = getState();
-      PhotoPosts.render(posts.getPhotoPosts(0, postsInViewCnt, filterConfig));
+      getState().postsInViewCnt = availablePostsCnt;
+      showPosts();
     });
 }
 
 function showMorePosts() {
-  showPosts();
+  loadMorePostsIfNeededAndShow(getState().postsInViewCnt + getState().postsPerPage);
 }
 function removePost(id) {
   api.deletePost(id)
     .then(() => {
-      PhotoPosts.remove(id);
       getState().postsInViewCnt--;
       getState().posts.removePhotoPost(id);
+      PhotoPosts.remove(id);
     })
     .catch(err => console.log(err));
 }
 
 function filterPosts(filterConfig) {
+  clearPostsViewConfig();
   getState().filterConfig = filterConfig;
-  getState().postsInViewCnt = 0;
-  showPosts();
+  loadMorePostsIfNeededAndShow(getState().postsPerPage);
 }
 
 function likePost(id) {
   api.likePost(id, getState().user.name)
-    .then(() => {
-      getState().posts.getPhotoPost(id).like(getState().user.name);
+    .then((post) => {
+      getState().posts.editPhotoPost(id, post);
+      PhotoPosts.update(id, post);
     });
 }
 
@@ -85,18 +96,18 @@ function createPost() {
   setPage('editor');
 }
 
-function savePost(postObj) {
-  if (!postObj.id) {
-    const postObj1 = Object.create({}, postObj, { author: getState().user.name });
-    api.createPost(postObj1)
+function savePost(postToSave) {
+  if (postToSave.id) {
+    api.updatePost(postToSave.id, postToSave)
       .then((post) => {
-        getState().posts.addPhotoPost(post);
+        getState().posts.editPhotoPost(post.id, post);
         setPage('app');
       });
   } else {
-    api.updatePost(postObj)
+    postToSave.author = getState().user.name;
+    api.createPost(postToSave)
       .then((post) => {
-        getState().posts.editPhotoPost(post.id, post);
+        getState().posts.addPhotoPost(post);
         setPage('app');
       });
   }
@@ -144,16 +155,15 @@ export default function handle(action) {
       filterPosts(action.filterConfig);
       break;
     case 'SHOW_POSTS': {
-      getState().postsInViewCnt = 0;
-      getState().filterConfig = null;
-      showPosts();
+      clearPostsViewConfig();
+      loadMorePostsIfNeededAndShow(getState().postsPerPage);
       break;
     }
     case 'EDIT_POST':
       editPost(action.id);
       break;
     case 'SAVE_POST':
-      savePost(action.post, action.editor);
+      savePost(action.post);
       break;
     case 'SHOW_MORE_POSTS':
       showMorePosts();

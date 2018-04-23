@@ -163,8 +163,14 @@ function removeChildren(element) {
 
 
 
+function clearPostsViewConfig() {
+  Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = 0;
+  Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().filterConfig = null;
+}
+
 function setPage(pageName, args) {
   Object(__WEBPACK_IMPORTED_MODULE_1__util__["b" /* removeChildren */])(document.body);
+  clearPostsViewConfig();
   let page = null;
   switch (pageName) {
     case 'signIn':
@@ -182,53 +188,58 @@ function setPage(pageName, args) {
   Object(__WEBPACK_IMPORTED_MODULE_1__util__["c" /* render */])(page, document.body);
 }
 
-function loadMorePostsIfNeeded() {
-  const { postsPerPage, postsInViewCnt, filterConfig } = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])();
-  const availablePosts = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.getPhotoPosts(postsInViewCnt, postsPerPage, filterConfig);
-  if (availablePosts.length < Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsPerPage) {
-    let availablePostsCnt = availablePosts.length;
-    return __WEBPACK_IMPORTED_MODULE_8__api__["c" /* getPosts */](postsInViewCnt, postsPerPage, filterConfig)
-      .then((posts) => {
-        posts.forEach(post => Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.addPhotoPost(post));
-        availablePostsCnt += posts.length;
-        return availablePostsCnt;
-      });
-  }
-  return Promise.resolve(postsPerPage);
+function showPosts() {
+  const { posts, postsInViewCnt, filterConfig } = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])();
+  const postsToShow = posts.getPhotoPosts(0, postsInViewCnt, filterConfig);
+  __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].render(postsToShow);
 }
 
-function showPosts() {
-  loadMorePostsIfNeeded()
+function loadMorePostsIfNeeded(wantedPostsCnt) {
+  const { filterConfig } = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])();
+  const availablePosts = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.getPhotoPosts(0, wantedPostsCnt, filterConfig);
+  const availablePostsCnt = availablePosts.length;
+  if (availablePostsCnt < wantedPostsCnt) {
+    return __WEBPACK_IMPORTED_MODULE_8__api__["c" /* getPosts */](availablePostsCnt, wantedPostsCnt - availablePostsCnt, filterConfig)
+      .then((posts) => {
+        posts.forEach(post => Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.addPhotoPost(post));
+        return availablePostsCnt + posts.length;
+      });
+  }
+  return Promise.resolve(wantedPostsCnt);
+}
+
+function loadMorePostsIfNeededAndShow(wantedPostsCnt) {
+  loadMorePostsIfNeeded(wantedPostsCnt)
     .then((availablePostsCnt) => {
-      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt += availablePostsCnt;
-      const { posts, postsInViewCnt, filterConfig } = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])();
-      __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].render(posts.getPhotoPosts(0, postsInViewCnt, filterConfig));
+      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = availablePostsCnt;
+      showPosts();
     });
 }
 
 function showMorePosts() {
-  showPosts();
+  loadMorePostsIfNeededAndShow(Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt + Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsPerPage);
 }
 function removePost(id) {
   __WEBPACK_IMPORTED_MODULE_8__api__["b" /* deletePost */](id)
     .then(() => {
-      __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].remove(id);
       Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt--;
       Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.removePhotoPost(id);
+      __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].remove(id);
     })
     .catch(err => console.log(err));
 }
 
 function filterPosts(filterConfig) {
+  clearPostsViewConfig();
   Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().filterConfig = filterConfig;
-  Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = 0;
-  showPosts();
+  loadMorePostsIfNeededAndShow(Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsPerPage);
 }
 
 function likePost(id) {
   __WEBPACK_IMPORTED_MODULE_8__api__["d" /* likePost */](id, Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name)
-    .then(() => {
-      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.getPhotoPost(id).like(Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name);
+    .then((post) => {
+      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.editPhotoPost(id, post);
+      __WEBPACK_IMPORTED_MODULE_2__components_PhotoPosts__["a" /* default */].update(id, post);
     });
 }
 
@@ -240,18 +251,18 @@ function createPost() {
   setPage('editor');
 }
 
-function savePost(postObj) {
-  if (!postObj.id) {
-    const postObj1 = Object.create({}, postObj, { author: Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name });
-    __WEBPACK_IMPORTED_MODULE_8__api__["a" /* createPost */](postObj1)
+function savePost(postToSave) {
+  if (postToSave.id) {
+    __WEBPACK_IMPORTED_MODULE_8__api__["f" /* updatePost */](postToSave.id, postToSave)
       .then((post) => {
-        Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.addPhotoPost(post);
+        Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.editPhotoPost(post.id, post);
         setPage('app');
       });
   } else {
-    __WEBPACK_IMPORTED_MODULE_8__api__["f" /* updatePost */](postObj)
+    postToSave.author = Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().user.name;
+    __WEBPACK_IMPORTED_MODULE_8__api__["a" /* createPost */](postToSave)
       .then((post) => {
-        Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.editPhotoPost(post.id, post);
+        Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().posts.addPhotoPost(post);
         setPage('app');
       });
   }
@@ -299,16 +310,15 @@ function handle(action) {
       filterPosts(action.filterConfig);
       break;
     case 'SHOW_POSTS': {
-      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsInViewCnt = 0;
-      Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().filterConfig = null;
-      showPosts();
+      clearPostsViewConfig();
+      loadMorePostsIfNeededAndShow(Object(__WEBPACK_IMPORTED_MODULE_0__state__["a" /* getState */])().postsPerPage);
       break;
     }
     case 'EDIT_POST':
       editPost(action.id);
       break;
     case 'SAVE_POST':
-      savePost(action.post, action.editor);
+      savePost(action.post);
       break;
     case 'SHOW_MORE_POSTS':
       showMorePosts();
@@ -589,16 +599,6 @@ PhotoPosts.update = function (id, post) {
     node.parentNode.replaceChild(Object(__WEBPACK_IMPORTED_MODULE_1__PhotoPost__["a" /* default */])({ post }), node);
   }
 };
-
-// PhotoPosts.create = function () {
-//   element.removeChild(element.firstChild);
-//   element.appendChild(EditPost());
-// };
-
-// PhotoPosts.edit = function (post) {
-//   element.removeChild(element.firstChild);
-//   element.appendChild(EditPost(post));
-// };
 
 PhotoPosts.remove = function (id) {
   const node = findNode(id);
@@ -1112,7 +1112,8 @@ function EditPost(post = {
     <div class="post">
       <form class="post__edit-form">
         <img class="post__photo" alt="Photo preview" src=${post.photoLink} />
-        <div>Photo link: <input id="photoLink" required type="text" value="${post.photoLink}" class="input"/></div>
+        <div>Photo link: <input id="photoLink" type="text" value="${post.photoLink}" class="input"/></div>
+        <div><label class="input" for="photoFile">Load photo</label><input type="file" accept="image/*" id="photoFile"></div>
         <div class="post__tags">
           Tags:
           <span id="tags"></span>
@@ -1124,8 +1125,7 @@ function EditPost(post = {
             <textarea 
               required 
               maxlength="200"
-              class="input post__description post__description--editable">
-              ${post.description}
+              class="input post__description post__description--editable">${post.description}
             </textarea>
           </div>
         </div>
@@ -1136,9 +1136,34 @@ function EditPost(post = {
   const tagsWrapper = element.querySelector('#tags');
   post.tags.forEach(tag => tagsWrapper.appendChild(makeTag(tag)));
 
+  let state = {
+    usePhotoLink: true,
+    photoLink: post.photoLink,
+  };
+
   element.querySelector('#photoLink').onblur = (event) => {
     const url = event.target.value;
-    element.querySelector('.post__photo').src = url;
+    if (url !== state.photoLink && url !== '') {
+      element.querySelector('.post__photo').src = url;
+      state = {
+        usePhotoLink: true,
+        photoLink: url,
+      };
+    }
+  };
+
+  element.querySelector('#photoFile').onchange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      state = {
+        usePhotoLink: false,
+        photoFile: file,
+      };
+      element.querySelector('.post__photo').src = reader.result;
+      element.querySelector('#photoLink').value = '';
+    };
+    reader.readAsDataURL(file);
   };
 
   element.querySelector('.post__tag--add').onclick = () => {
@@ -1149,19 +1174,29 @@ function EditPost(post = {
 
   element.querySelector('.post__edit-form').onsubmit = (event) => {
     event.preventDefault();
+    if (!state.photoLink && !state.photoFile) {
+      alert('Please, provide either photo link, either photo file');
+      return;
+    }
     const tags = Array.prototype.map.call(
       element.querySelectorAll('.post__tag--editable'),
       node => node.innerText,
     );
-    const photoLink = element.querySelector('#photoLink').value;
     const description = element.querySelector('.post__description').value;
+    const postToSend = Object.assign({}, post, {
+      tags,
+      description,
+    });
+    if (state.usePhotoLink) {
+      postToSend.photoLink = state.photoLink;
+    } else {
+      delete postToSend.photoLink;
+      postToSend.photoFile = state.photoFile;
+    }
     Object(__WEBPACK_IMPORTED_MODULE_1__handlers__["a" /* default */])({
       type: 'SAVE_POST',
-      post: Object.assign(post, {
-        tags,
-        photoLink,
-        description,
-      }),
+      photo: state,
+      post: postToSend,
     });
   };
 
@@ -1200,23 +1235,49 @@ function EditPost(post = {
 function buildRequest(url, params = {}) {
   const stringParams = Object.keys(params)
     .filter(key => typeof params[key] !== 'undefined')
-    .reduce((res, key) => res + '&' + key + '=' + JSON.stringify(params[key]), '');
-  return url + '?' + stringParams.slice(1);
+    .reduce((res, key) => `${res}&${key}=${JSON.stringify(params[key])}`, '');
+  return `${url}?${stringParams.slice(1)}`;
+}
+
+function handleErrors(response) {
+  if (!response.ok) {
+    throw Error(response.statusText);
+  }
+  return response;
+}
+
+function objectToFormData(obj) {
+  const data = new FormData();
+  Object.getOwnPropertyNames(obj)
+    .forEach(key => data.append(key, obj[key]));
+  data.append('tags', JSON.stringify(obj.tags));
+  return data;
 }
 
 function parsePost(rawPost) {
   const postObj = Object.assign({}, rawPost, { createdAt: new Date(rawPost.createdAt) });
+  postObj.likes = postObj.likes.map((person) => {
+    let str = person;
+    try {
+      str = JSON.parse(person);
+    } catch (e) {
+
+    }
+    return str;
+  });
   return new __WEBPACK_IMPORTED_MODULE_0__models_PhotoPost__["a" /* default */](postObj);
 }
 
 function getPost(id) {
   return fetch(buildRequest(`/posts/${id}`))
+    .then(handleErrors)
     .then(response => response.json())
     .then(rawPost => parsePost(rawPost));
 }
 
 function getPosts(skip = 0, top = 10, filterConfig = {}) {
   return fetch(buildRequest('/posts', { top, skip, filterConfig }))
+    .then(handleErrors)
     .then(response => response.json())
     .then(rawPosts => rawPosts.map(rawPost => parsePost(rawPost)));
 }
@@ -1224,29 +1285,31 @@ function getPosts(skip = 0, top = 10, filterConfig = {}) {
 function likePost(id, user) {
   return fetch(buildRequest(`/posts/${id}/like`, { user }), {
     method: 'PUT',
-  });
+  })
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(json => parsePost(json));
 }
 
 function createPost(post) {
   return fetch('/posts', {
     method: 'POST',
-    body: JSON.stringify(post),
-    headers: {
-      'content-type': 'application/json',
-    },
+    body: objectToFormData(post),
   })
-    .then(response => parsePost(response.json()));
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(json => parsePost(json));
 }
 
-function updatePost(id, fields) {
+function updatePost(id, post) {
+  const data = objectToFormData(post);
   return fetch(`/posts/${id}`, {
     method: 'PUT',
-    body: JSON.stringify(fields),
-    headers: {
-      'content-type': 'application/json',
-    },
+    body: data,
   })
-    .then(response => parsePost(response.json()));
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(json => parsePost(json));
 }
 
 function deletePost(id) {
