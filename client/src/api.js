@@ -3,9 +3,11 @@ import PhotoPost from './models/PhotoPost';
 function buildRequest(url, params = {}) {
   const stringParams = Object.keys(params)
     .filter(key => typeof params[key] !== 'undefined')
-    .reduce((res, key) => `${res}&${key}=${
-      params[key] instanceof Object ? JSON.stringify(params[key]) : params[key]}`, 
-    '');
+    .reduce(
+      (res, key) => `${res}&${key}=${
+        params[key] instanceof Object ? JSON.stringify(params[key]) : params[key]}`,
+      '',
+    );
   return `${url}?${stringParams.slice(1)}`;
 }
 
@@ -91,4 +93,11 @@ export function login(email, password) {
     }
     return Promise.reject();
   });
+}
+
+export function poll() {
+  return fetch('/poll')
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(postsRaw => postsRaw.map(rawPost => parsePost(rawPost)));
 }

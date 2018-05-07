@@ -33,6 +33,16 @@ function setPage(pageName, args) {
   render(page, document.body);
 }
 
+// function poll() {
+//   api.poll()
+//     .then((polledPosts) => {
+//       polledPosts.forEach((polledPost) => {
+//         if (polledPost)
+//       });
+//       poll();
+//     });
+// }
+
 function showPosts() {
   const { posts, postsInViewCnt, filterConfig } = getState();
   const postsToShow = posts.getPhotoPosts(0, postsInViewCnt, filterConfig);
@@ -53,25 +63,24 @@ function loadMorePostsIfNeeded(wantedPostsCnt) {
   return Promise.resolve(wantedPostsCnt);
 }
 
-function loadMorePostsIfNeededAndShow(wantedPostsCnt) {
-  loadMorePostsIfNeeded(wantedPostsCnt)
-    .then((availablePostsCnt) => {
-      getState().postsInViewCnt = availablePostsCnt;
-      showPosts();
-    });
+async function loadMorePostsIfNeededAndShow(wantedPostsCnt) {
+  const availablePostsCnt = await loadMorePostsIfNeeded(wantedPostsCnt);
+  getState().postsInViewCnt = availablePostsCnt;
+  showPosts();
 }
 
 function showMorePosts() {
   loadMorePostsIfNeededAndShow(getState().postsInViewCnt + getState().postsPerPage);
 }
-function removePost(id) {
-  api.deletePost(id)
-    .then(() => {
-      getState().postsInViewCnt--;
-      getState().posts.removePhotoPost(id);
-      PhotoPosts.remove(id);
-    })
-    .catch(err => console.log(err));
+async function removePost(id) {
+  try {
+    await api.deletePost(id);
+    getState().postsInViewCnt--;
+    getState().posts.removePhotoPost(id);
+    PhotoPosts.remove(id);
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 function filterPosts(filterConfig) {
@@ -80,12 +89,10 @@ function filterPosts(filterConfig) {
   loadMorePostsIfNeededAndShow(getState().postsPerPage);
 }
 
-function likePost(id) {
-  api.likePost(id, getState().user.name)
-    .then((post) => {
-      getState().posts.editPhotoPost(id, post);
-      PhotoPosts.update(id, post);
-    });
+async function likePost(id) {
+  const post = await api.likePost(id, getState().user.name);
+  getState().posts.editPhotoPost(id, post);
+  PhotoPosts.update(id, post);
 }
 
 function editPost(id) {
@@ -96,20 +103,14 @@ function createPost() {
   setPage('editor');
 }
 
-function savePost(postToSave) {
+async function savePost(postToSave) {
   if (postToSave.id) {
-    api.updatePost(postToSave.id, postToSave)
-      .then((post) => {
-        getState().posts.editPhotoPost(post.id, post);
-        setPage('app');
-      });
+    const post = await api.updatePost(postToSave.id, postToSave);
+    getState().posts.editPhotoPost(post.id, post);
   } else {
     postToSave.author = getState().user.name;
-    api.createPost(postToSave)
-      .then((post) => {
-        getState().posts.addPhotoPost(post);
-        setPage('app');
-      });
+    getState().posts.addPhotoPost(post);
+    setPage('app');
   }
 }
 
@@ -120,7 +121,7 @@ function logout() {
   setPage('signIn');
 }
 
-function login({
+async function login({
   email,
   password,
   onLoggedIn,
@@ -131,12 +132,13 @@ function login({
     getState().user = null;
     onLoggedIn();
   } else {
-    api.login(email, password)
-      .then((user) => {
-        getState().user = user;
-        onLoggedIn();
-      })
-      .catch(onError);
+    try {
+      const user = await api.login(email, password);
+      getState().user = user;
+      onLoggedIn();
+    } catch (err) {
+      onError();
+    }
   }
 }
 

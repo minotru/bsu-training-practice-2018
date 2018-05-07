@@ -18,6 +18,8 @@ const upload = multer({
   storage,
 });
 
+// const changesHistory = [];
+
 function parseFormData(req, res, next) {
   if (req.file) {
     req.body.photoLink = `photos/${req.file.filename}`;
@@ -89,10 +91,9 @@ router.delete('/posts/:id', (req, res) => {
   }
   deletePhotoFile(post.photoLink);
   if (postsController.removePost(req.params.id)) {
-    res.sendStatus(200);
-  } else {
-    res.sendStatus(404);
+    return res.sendStatus(200);
   }
+  return res.sendStatus(404);
 });
 
 router.post('/auth', (req, res) => {
@@ -103,5 +104,9 @@ router.post('/auth', (req, res) => {
     res.sendStatus(401);
   }
 });
+
+// router.get('/poll', (req, res) => {
+
+// });
 
 module.exports = router;
