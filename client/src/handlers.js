@@ -109,7 +109,7 @@ async function savePost(postToSave) {
     getState().posts.editPhotoPost(post.id, post);
   } else {
     postToSave.author = getState().user.name;
-    getState().posts.addPhotoPost(post);
+    getState().posts.addPhotoPost(postToSave);
     setPage('app');
   }
 }
