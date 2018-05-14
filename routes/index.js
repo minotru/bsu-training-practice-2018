@@ -3,7 +3,7 @@ const path = require('path');
 const router = require('express').Router();
 const multer = require('multer');
 const postsController = require('../controllers/postsController');
-const accountsController = require('../controllers/accountsController');
+const passport = require('passport');
 
 const photosDir = path.resolve(__dirname, '../data/photos');
 const storage = multer.diskStorage({
@@ -18,13 +18,16 @@ const upload = multer({
   storage,
 });
 
-// const changesHistory = [];
+function needsAuthorization(req, res, next) {
+  return passport.authorize(req, res, next);
+}
 
 function parseFormData(req, res, next) {
   if (req.file) {
     req.body.photoLink = `photos/${req.file.filename}`;
   }
-  req.body.likes = req.body.likes.split(',');
+  req.body.likes = req.body.likes ? req.body.likes.split(',') : [];
+  req.body.tags = req.body.tags || [];
   next();
 }
 
@@ -62,7 +65,8 @@ router.put('/posts/:id/like', (req, res) => {
   }
 });
 
-router.post('/posts', upload.single('photoFile'), parseFormData, (req, res) => {
+router.post('/posts',  upload.single('photoFile'), parseFormData, (req, res) => {
+  // console.log('in create post');
   const post = postsController.createPost(req.body);
   if (post) {
     res.json(post);
@@ -71,7 +75,7 @@ router.post('/posts', upload.single('photoFile'), parseFormData, (req, res) => {
   }
 });
 
-router.put('/posts/:id', upload.single('photoFile'), parseFormData, (req, res) => {
+router.put('/posts/:id',  upload.single('photoFile'), parseFormData, (req, res) => {
   const oldPost = postsController.getPost(req.params.id);
   if (!oldPost) {
     return res.sendStatus(404);
@@ -96,17 +100,14 @@ router.delete('/posts/:id', (req, res) => {
   return res.sendStatus(404);
 });
 
-router.post('/auth', (req, res) => {
-  const user = accountsController.findUser(req.body.email, req.body.password);
-  if (user) {
-    res.json(user);
-  } else {
-    res.sendStatus(401);
-  }
+
+router.post('/auth', passport.authenticate('json'), (req, res) => {
+  res.json(req.user);
 });
 
-// router.get('/poll', (req, res) => {
-
-// });
+router.get('/logout', (req, res) => {
+  req.logout();
+  res.sendStatus(200);
+});
 
 module.exports = router;

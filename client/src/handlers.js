@@ -6,6 +6,7 @@ import SignIn from './components/SignIn';
 import App from './components/App';
 import Editor from './components/Editor';
 import { default as PhotoPostsModel } from './models/PhotoPosts';
+import { default as PhotoPostModel } from './models/PhotoPost';
 import * as api from './api';
 
 function clearPostsViewConfig() {
@@ -33,23 +34,13 @@ function setPage(pageName, args) {
   render(page, document.body);
 }
 
-// function poll() {
-//   api.poll()
-//     .then((polledPosts) => {
-//       polledPosts.forEach((polledPost) => {
-//         if (polledPost)
-//       });
-//       poll();
-//     });
-// }
-
 function showPosts() {
   const { posts, postsInViewCnt, filterConfig } = getState();
   const postsToShow = posts.getPhotoPosts(0, postsInViewCnt, filterConfig);
   PhotoPosts.render(postsToShow);
 }
 
-function loadMorePostsIfNeeded(wantedPostsCnt) {
+async function loadMorePostsIfNeeded(wantedPostsCnt) {
   const { filterConfig } = getState();
   const availablePosts = getState().posts.getPhotoPosts(0, wantedPostsCnt, filterConfig);
   const availablePostsCnt = availablePosts.length;
@@ -108,13 +99,19 @@ async function savePost(postToSave) {
     const post = await api.updatePost(postToSave.id, postToSave);
     getState().posts.editPhotoPost(post.id, post);
   } else {
-    postToSave.author = getState().user.name;
-    getState().posts.addPhotoPost(postToSave);
-    setPage('app');
+    postToSave = new PhotoPostModel({
+      ...postToSave, 
+      author: getState().user.name,
+    });
+    const post = await api.createPost(postToSave);
+    getState().posts.addPhotoPost(post);
   }
+  setPage('app');
 }
 
-function logout() {
+async function logout() {
+  await api.logout();
+  localStorage.setItem('user', null);
   getState().user = null;
   getState().posts = PhotoPostsModel.fromArray([]);
   getState().postsInViewCnt = 0;
@@ -135,6 +132,7 @@ async function login({
     try {
       const user = await api.login(email, password);
       getState().user = user;
+      localStorage.setItem('user', JSON.stringify(user));
       onLoggedIn();
     } catch (err) {
       onError();

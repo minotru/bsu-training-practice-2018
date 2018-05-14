@@ -48,8 +48,7 @@ export default function EditPost(post = {
             <textarea 
               required 
               maxlength="200"
-              class="input post__description post__description--editable">${post.description}
-            </textarea>
+              class="input post__description post__description--editable">${post.description}</textarea>
           </div>
         </div>
         <button type="submit" class="input bright">Save</button>
@@ -65,7 +64,7 @@ export default function EditPost(post = {
   };
 
   element.querySelector('#photoLink').onblur = (event) => {
-    const url = event.target.value;
+    const url = element.querySelector('#photoLink').value;
     if (url !== state.photoLink && url !== '') {
       element.querySelector('.post__photo').src = url;
       state = {

@@ -19,6 +19,6 @@ module.exports = {
     filename: 'bundle.js',
     path: `${__dirname}/public/`,
   },
-  // mode: 'development',
+  mode: 'development',
 };
 

@@ -1,15 +1,15 @@
 [
     {
-        "email": "senich10@mail.ru",
+        "email": "test@mail.ru",
         "name": "simon_karasik",
-        "password": "505137s",
+        "passwordHash": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
         "avatarLink": "avatar.jpg",
         "id": "'1"
     },
     {
-        "email": "admin@example.org",
-        "password": "admin",
-        "name": "admin",
+        "email": "example@example.org",
+        "passwordHash": "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c",
+        "name": "example",
         "id": "0"
     }
 ]

@@ -16,7 +16,7 @@ function updateFile() {
   fs.writeFile(filePath, JSON.stringify({
     idCounter: PhotoPost.getIdCounter(),
     posts: posts.getArray(),
-  }));
+  }), (err) => {});
 }
 
 function createPost(post) {

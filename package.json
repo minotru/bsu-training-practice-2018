@@ -16,7 +16,7 @@
   "author": "Simon Karasik",
   "license": "ISC",
   "bugs": {
-  "url": "https://github.com/minotru/bsu-training-practice-2018/issues"
+    "url": "https://github.com/minotru/bsu-training-practice-2018/issues"
   },
   "homepage": "https://github.com/minotru/bsu-training-practice-2018#readme",
   "dependencies": {
@@ -25,7 +25,11 @@
     "express": "^4.16.3",
     "body-parser": "^1.18.2",
     "morgan": "^1.9.0",
-    "multer": "^1.3.0"
+    "multer": "^1.3.0",
+    "passport-json": "^1.2.0",
+    "passport": "^0.4.0",
+    "express-session": "^1.15.6",
+    "cookie-parser": "^1.4.3"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

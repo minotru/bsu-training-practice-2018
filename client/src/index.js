@@ -6,7 +6,7 @@ const initialState = {
   posts: PhotoPostsModel.fromArray([]),
   filterConfig: null,
   postsInViewCnt: 0,
-  user: null,
+  user: JSON.parse(localStorage.getItem('user')) || null,
   postsPerPage: 10,
 };
 setState(initialState);

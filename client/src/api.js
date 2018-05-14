@@ -1,4 +1,5 @@
 import PhotoPost from './models/PhotoPost';
+import { getCiphers } from 'crypto';
 
 function buildRequest(url, params = {}) {
   const stringParams = Object.keys(params)
@@ -93,6 +94,10 @@ export function login(email, password) {
     }
     return Promise.reject();
   });
+}
+
+export function logout() {
+  return fetch('/logout');
 }
 
 export function poll() {
