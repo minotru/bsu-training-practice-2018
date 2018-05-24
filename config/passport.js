@@ -1,10 +1,18 @@
 const JsonStrategy = require('passport-json').Strategy;
 const accountsController = require('../controllers/accountsController');
 
-function configure(passport) {
-  passport.serializeUser((user, done) => done(null, user.id));
+function serializeUser(user, done) {
+  return done(null, user.id);
+}
 
-  passport.deserializeUser((id, done) => done(null, accountsController.findUserById(id)));
+function deserializeUser(id, done) {
+  return done(null, accountsController.findUserById(id));
+}
+
+function configure(passport) {
+  passport.serializeUser(serializeUser);
+
+  passport.deserializeUser(deserializeUser);
 
   passport.use(new JsonStrategy(
     { usernameProp: 'email' },

@@ -49,7 +49,8 @@ class PhotoPost {
   }
 
   static nextId() {
-    return (idCounter++).toString();
+    idCounter += 1;
+    return idCounter.toString();
   }
 
   static resetIdCounter(newIdCounter) {

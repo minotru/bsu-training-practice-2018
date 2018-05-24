@@ -4,23 +4,21 @@ const filePath = './data/users.json';
 const users = JSON.parse(fs.readFileSync(filePath));
 const { createHash } = require('crypto');
 
+function hidePrivateFields(user) {
+  const hidden = Object.assign({}, user);
+  delete hidden.passwordHash;
+  delete hidden.email;
+  return hidden;
+}
+
 module.exports.findUser = function findUser(email, password) {
   const passwordHash = createHash('sha256').update(password).digest('hex');
-  let foundUser = users.find(user => user.email === email && user.passwordHash === passwordHash);
-  if (foundUser) {
-    foundUser = Object.assign({}, foundUser);
-    delete foundUser.email;
-    delete foundUser.password;
-  }
-  return foundUser;
+  const foundUser = users.find(user => user.email === email && user.passwordHash === passwordHash);
+  return foundUser ? hidePrivateFields(foundUser) : foundUser;
 };
 
 module.exports.findUserById = function (id) {
   const foundUser = users.find(user => user.id === id);
-  if (foundUser) {
-    delete foundUser.email;
-    delete foundUser.password;
-  }
-  return foundUser;
+  return foundUser ? hidePrivateFields(foundUser) : foundUser;
 };
 

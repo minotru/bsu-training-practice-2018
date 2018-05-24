@@ -8,11 +8,11 @@ import { getState } from '../state';
 
 export default function PhotoPost({ post }) {
   const { user } = getState();
-  const pad = s => new String(s).padStart(2, '0');
-  const formatDate = date => pad(date.getDate()) + '.' + pad(date.getMonth() + 1) + '.' + pad(date.getFullYear() % 100);
+  const pad = number => new String(number).padStart(2, '0');
+  const formatDate = date => `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${pad(date.getFullYear() % 100)}`;
   const makeTag = tag => `<a class="post__tag">${tag}</a>`;
   const makeTags = tags =>
-    tags.reduce((s, tag) => s + makeTag(tag) + ' ', '');
+    tags.reduce((s, tag) => `${s + makeTag(tag)} `, '');
   const isAuthor = user && post.author === user.name;
   const isLiked = user && post.likes.indexOf(user.name) !== -1;
   const element = stringToDOMElement(`

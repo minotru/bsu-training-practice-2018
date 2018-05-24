@@ -19,15 +19,20 @@ const upload = multer({
 });
 
 function needsAuthorization(req, res, next) {
-  return passport.authorize(req, res, next);
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.sendStatus(401);
+  }
 }
 
 function parseFormData(req, res, next) {
   if (req.file) {
     req.body.photoLink = `photos/${req.file.filename}`;
   }
-  req.body.likes = req.body.likes ? req.body.likes.split(',') : [];
-  req.body.tags = req.body.tags || [];
+  const makeArray = str => str.trim().split(',');
+  req.body.likes = req.body.likes ? makeArray(req.body.likes) : [];
+  req.body.tags = req.body.tags ? makeArray(req.body.tags) : [];
   next();
 }
 
@@ -49,15 +54,15 @@ router.get('/posts/:id', (req, res) => {
   }
 });
 
-router.get('/posts', (req, res) => {
+router.post('/posts', (req, res) => {
   const { top = 10, skip = 0 } = req.query;
-  const filterConfig = req.query.filterConfig ? JSON.parse(req.query.filterConfig) : {};
+  const filterConfig = req.body || {};
   const posts = postsController.getPosts(skip, top, filterConfig);
   res.json(posts);
 });
 
-router.put('/posts/:id/like', (req, res) => {
-  const post = postsController.likePost(req.params.id, req.query.user);
+router.put('/posts/:id/like', needsAuthorization, (req, res) => {
+  const post = postsController.likePost(req.params.id, req.user.name);
   if (post) {
     res.json(post);
   } else {
@@ -65,7 +70,7 @@ router.put('/posts/:id/like', (req, res) => {
   }
 });
 
-router.post('/posts',  upload.single('photoFile'), parseFormData, (req, res) => {
+router.post('/posts', needsAuthorization, upload.single('photoFile'), parseFormData, (req, res) => {
   // console.log('in create post');
   const post = postsController.createPost(req.body);
   if (post) {
@@ -75,23 +80,27 @@ router.post('/posts',  upload.single('photoFile'), parseFormData, (req, res) => 
   }
 });
 
-router.put('/posts/:id',  upload.single('photoFile'), parseFormData, (req, res) => {
+router.put('/posts/:id', needsAuthorization, upload.single('photoFile'), parseFormData, (req, res) => {
   const oldPost = postsController.getPost(req.params.id);
   if (!oldPost) {
     return res.sendStatus(404);
+  } else if (req.user.name !== oldPost.author) {
+    return res.sendStatus(403);
   }
-  deletePhotoFile(oldPost.photoLink); // delete old file
   const post = postsController.updatePost(req.params.id, req.body);
   if (post) {
+    deletePhotoFile(oldPost.photoLink); // delete old file
     return res.json(post);
   }
   return res.sendStatus(400);
 });
 
-router.delete('/posts/:id', (req, res) => {
+router.delete('/posts/:id', needsAuthorization, (req, res) => {
   const post = postsController.getPost(req.params.id);
   if (!post) {
     return res.sendStatus(404);
+  } else if (req.user.name !== post.author) {
+    return res.sendStatus(403);
   }
   deletePhotoFile(post.photoLink);
   if (postsController.removePost(req.params.id)) {

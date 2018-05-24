@@ -4,10 +4,8 @@ const PhotoPosts = require('../models/PhotoPosts');
 
 const filePath = './data/posts.json';
 const content = JSON.parse(fs.readFileSync(filePath));
-const postsRaw = content.posts.map((post) => {
-  post.createdAt = new Date(post.createdAt);
-  return post;
-});
+const postsRaw = content.posts.map(post =>
+  Object.assign({}, post, { createdAt: new Date(post.createdAt) }));
 const posts = PhotoPosts.fromArray(postsRaw);
 
 PhotoPost.resetIdCounter(content.idCounter);
@@ -16,11 +14,11 @@ function updateFile() {
   fs.writeFile(filePath, JSON.stringify({
     idCounter: PhotoPost.getIdCounter(),
     posts: posts.getArray(),
-  }), (err) => {});
+  }), () => {});
 }
 
-function createPost(post) {
-  post.createdAt = new Date();
+function createPost(postNoDate) {
+  const post = Object.assign({}, postNoDate, { createdAt: new Date() });
   const createdPost = posts.addPhotoPost(post);
   if (createdPost) {
     updateFile();

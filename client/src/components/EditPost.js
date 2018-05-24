@@ -63,7 +63,7 @@ export default function EditPost(post = {
     photoLink: post.photoLink,
   };
 
-  element.querySelector('#photoLink').onblur = (event) => {
+  element.querySelector('#photoLink').onblur = () => {
     const url = element.querySelector('#photoLink').value;
     if (url !== state.photoLink && url !== '') {
       element.querySelector('.post__photo').src = url;

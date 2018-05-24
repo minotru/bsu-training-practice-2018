@@ -1,7 +1,6 @@
 import PhotoPost from './models/PhotoPost';
-import { getCiphers } from 'crypto';
 
-function buildRequest(url, params = {}) {
+function buildRequest(url, params) {
   const stringParams = Object.keys(params)
     .filter(key => typeof params[key] !== 'undefined')
     .reduce(
@@ -32,22 +31,29 @@ function parsePost(rawPost) {
 }
 
 export function getPost(id) {
-  return fetch(buildRequest(`/posts/${id}`))
+  return fetch(buildRequest(`/posts/${id}`, {
+    credentials: 'include',
+  }))
     .then(handleErrors)
     .then(response => response.json())
     .then(rawPost => parsePost(rawPost));
 }
 
 export function getPosts(skip = 0, top = 10, filterConfig = {}) {
-  return fetch(buildRequest('/posts', { top, skip, filterConfig }))
+  return fetch(buildRequest('/posts', { top, skip }), {
+    method: 'POST',
+    body: JSON.stringify(filterConfig),
+    credentials: 'include',
+  })
     .then(handleErrors)
     .then(response => response.json())
     .then(rawPosts => rawPosts.map(rawPost => parsePost(rawPost)));
 }
 
-export function likePost(id, user) {
-  return fetch(buildRequest(`/posts/${id}/like`, { user }), {
+export function likePost(id) {
+  return fetch(`/posts/${id}/like`, {
     method: 'PUT',
+    credentials: 'include',
   })
     .then(handleErrors)
     .then(response => response.json())
@@ -58,6 +64,7 @@ export function createPost(post) {
   return fetch('/posts', {
     method: 'POST',
     body: objectToFormData(post),
+    credentials: 'include',
   })
     .then(handleErrors)
     .then(response => response.json())
@@ -69,6 +76,7 @@ export function updatePost(id, post) {
   return fetch(`/posts/${id}`, {
     method: 'PUT',
     body: data,
+    credentials: 'include',
   })
     .then(handleErrors)
     .then(response => response.json())
@@ -78,6 +86,7 @@ export function updatePost(id, post) {
 export function deletePost(id) {
   return fetch(`/posts/${id}`, {
     method: 'DELETE',
+    credentials: 'include',
   });
 }
 
@@ -88,6 +97,7 @@ export function login(email, password) {
       'content-type': 'application/json',
     },
     body: JSON.stringify({ email, password }),
+    credentials: 'include',
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -97,7 +107,10 @@ export function login(email, password) {
 }
 
 export function logout() {
-  return fetch('/logout');
+  return fetch('/logout', {
+    credentials: 'include',
+  })
+    .then(handleErrors);
 }
 
 export function poll() {

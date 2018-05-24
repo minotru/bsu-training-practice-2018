@@ -12,16 +12,16 @@ const PORT = 8080;
 const staticPath = `${__dirname}/client/public`;
 
 const app = express();
-// app.use(cookieParser);
+app.use(logger);
 app.use(express.static(staticPath));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(logger);
 
 app.use(session({
   secret: 'super-puper-secret',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
 }));
 app.use(passport.initialize());
 app.use(passport.session());

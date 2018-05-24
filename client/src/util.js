@@ -5,7 +5,7 @@ export function stringToDOMElement(s) {
 }
 
 export function addClassIf(condition, className, elseClassName = '') {
-  return condition ? (' ' + className) : (' ' + elseClassName);
+  return condition ? (` ${className}`) : (` ${elseClassName}`);
 }
 
 export function renderIf(condition, html) {
@@ -26,22 +26,22 @@ export function wrap(element) {
  */
 export function render(elements, wrapper) {
   if (!Array.isArray(elements)) {
-    elements = [elements];
+    wrapper.appendChild(elements);
+  } else {
+    elements.forEach(element => wrapper.appendChild(element));
   }
-
-  elements.forEach(element => wrapper.appendChild(element));
   return wrapper;
 }
 
 /**
- * @param {String} tag 
- * @param {Object} props 
- * @param {[Element]} children 
+ * @param {String} tag
+ * @param {Object} props
+ * @param {[Element]} children
  */
 export function createElement(tag, props, ...children) {
   const element = document.createElement(tag);
   Object.keys(props).forEach((propName) => {
-    element[propName] = props[propName]
+    element[propName] = props[propName];
   });
   children.forEach(child => element.appendChild(child));
   return element;

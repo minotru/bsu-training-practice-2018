@@ -81,7 +81,7 @@ function filterPosts(filterConfig) {
 }
 
 async function likePost(id) {
-  const post = await api.likePost(id, getState().user.name);
+  const post = await api.likePost(id);
   getState().posts.editPhotoPost(id, post);
   PhotoPosts.update(id, post);
 }
@@ -99,11 +99,11 @@ async function savePost(postToSave) {
     const post = await api.updatePost(postToSave.id, postToSave);
     getState().posts.editPhotoPost(post.id, post);
   } else {
-    postToSave = new PhotoPostModel({
-      ...postToSave, 
+    const postToSaveWithAuthor = new PhotoPostModel({
+      ...postToSave,
       author: getState().user.name,
     });
-    const post = await api.createPost(postToSave);
+    const post = await api.createPost(postToSaveWithAuthor);
     getState().posts.addPhotoPost(post);
   }
   setPage('app');
