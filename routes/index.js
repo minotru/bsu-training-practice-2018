@@ -64,6 +64,9 @@ router.post('/posts', (req, res) => {
 router.put('/posts/:id/like', needsAuthorization, (req, res) => {
   const post = postsController.likePost(req.params.id, req.user.name);
   if (post) {
+    if (post.author !== req.user.name) {
+      res.sendStatus(401);
+    }
     res.json(post);
   } else {
     res.sendStatus(404);
@@ -71,7 +74,6 @@ router.put('/posts/:id/like', needsAuthorization, (req, res) => {
 });
 
 router.post('/posts', needsAuthorization, upload.single('photoFile'), parseFormData, (req, res) => {
-  // console.log('in create post');
   const post = postsController.createPost(req.body);
   if (post) {
     res.json(post);
